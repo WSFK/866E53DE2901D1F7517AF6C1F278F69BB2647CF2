@@ -10,8 +10,12 @@
 #define handbooklite_PublicImport_h
 
 #import "UUID.h"
+#import "Util.h"
+#import "Config.h"
+#import "TokenUtil.h"
 
-#define DEVICEUUID [UUID getDeviceId]
+#define DEVICEUUID [Util getDeviceId]
 #define USERUUID [UUID getUUIDToString]
+#define DEVICETOKEN [TokenUtil getLocalToken]
 
 #endif
