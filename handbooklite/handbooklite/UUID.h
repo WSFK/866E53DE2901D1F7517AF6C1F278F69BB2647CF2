@@ -12,5 +12,5 @@
 
 + (NSString *)getUUIDToString;
 
-+ (NSString *) getDeviceId;
+
 @end

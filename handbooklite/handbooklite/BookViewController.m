@@ -1610,4 +1610,25 @@ __VA_ARGS__ \
   
 }
 
+//点击显示二维码
+- (void)didTwoCode:(id)sender{
+  NSMutableString *shareUrl = [[NSMutableString alloc] init];
+  [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
+  [shareUrl appendFormat:@"?su=%@",USERUUID];          //参数：分享者id
+  [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
+  [shareUrl appendFormat:@"&downloadnum=%@",currentBook.downnum];          //参数：下载码
+  [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];          //参数：hash
+  
+  UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
+  
+  //显示二维码
+  towCodeAlert =[[TowCodeAlertView alloc] initWithContentImage:twImage];
+  [towCodeAlert setDelegate:self];
+  [towCodeAlert show];
+}
+
+#pragma -mark TowCodeAlertDelegate
+- (void)closeTowCodeAlert{
+  towCodeAlert =nil;
+}
 @end

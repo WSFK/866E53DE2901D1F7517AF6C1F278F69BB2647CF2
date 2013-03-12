@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1523B23316EF09B400A55C3A /* bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22316EF09B400A55C3A /* bitstream.c */; };
+		1523B23416EF09B400A55C3A /* mask.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22516EF09B400A55C3A /* mask.c */; };
+		1523B23516EF09B400A55C3A /* QRCodeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22816EF09B400A55C3A /* QRCodeGenerator.m */; };
+		1523B23616EF09B400A55C3A /* qrencode.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22916EF09B400A55C3A /* qrencode.c */; };
+		1523B23716EF09B400A55C3A /* qrinput.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22B16EF09B400A55C3A /* qrinput.c */; };
+		1523B23816EF09B400A55C3A /* qrspec.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22D16EF09B400A55C3A /* qrspec.c */; };
+		1523B23916EF09B400A55C3A /* rscode.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B22F16EF09B400A55C3A /* rscode.c */; };
+		1523B23A16EF09B400A55C3A /* split.c in Sources */ = {isa = PBXBuildFile; fileRef = 1523B23116EF09B400A55C3A /* split.c */; };
+		1523B23D16EF0A3300A55C3A /* TowCodeAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B23C16EF0A3300A55C3A /* TowCodeAlertView.m */; };
+		1523B23E16EF0A3300A55C3A /* TowCodeAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B23C16EF0A3300A55C3A /* TowCodeAlertView.m */; };
+		1523B24116EF0C3900A55C3A /* Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B24016EF0C3900A55C3A /* Util.m */; };
+		1523B24216EF0C3900A55C3A /* Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B24016EF0C3900A55C3A /* Util.m */; };
 		E20611831622705C00FA7720 /* DownloadAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E20611821622705C00FA7720 /* DownloadAlertView.m */; };
 		E20611851622797B00FA7720 /* btn_green.png in Resources */ = {isa = PBXBuildFile; fileRef = E20611841622797A00FA7720 /* btn_green.png */; };
 		E2061188162294AC00FA7720 /* WaitAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2061187162294AB00FA7720 /* WaitAlertView.m */; };
@@ -187,6 +199,26 @@
 
 /* Begin PBXFileReference section */
 		1523B21D16EF07D800A55C3A /* PublicImport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PublicImport.h; sourceTree = "<group>"; };
+		1523B22316EF09B400A55C3A /* bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
+		1523B22416EF09B400A55C3A /* bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstream.h; sourceTree = "<group>"; };
+		1523B22516EF09B400A55C3A /* mask.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mask.c; sourceTree = "<group>"; };
+		1523B22616EF09B400A55C3A /* mask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mask.h; sourceTree = "<group>"; };
+		1523B22716EF09B400A55C3A /* QRCodeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeGenerator.h; sourceTree = "<group>"; };
+		1523B22816EF09B400A55C3A /* QRCodeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeGenerator.m; sourceTree = "<group>"; };
+		1523B22916EF09B400A55C3A /* qrencode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrencode.c; sourceTree = "<group>"; };
+		1523B22A16EF09B400A55C3A /* qrencode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrencode.h; sourceTree = "<group>"; };
+		1523B22B16EF09B400A55C3A /* qrinput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrinput.c; sourceTree = "<group>"; };
+		1523B22C16EF09B400A55C3A /* qrinput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrinput.h; sourceTree = "<group>"; };
+		1523B22D16EF09B400A55C3A /* qrspec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrspec.c; sourceTree = "<group>"; };
+		1523B22E16EF09B400A55C3A /* qrspec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrspec.h; sourceTree = "<group>"; };
+		1523B22F16EF09B400A55C3A /* rscode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rscode.c; sourceTree = "<group>"; };
+		1523B23016EF09B400A55C3A /* rscode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rscode.h; sourceTree = "<group>"; };
+		1523B23116EF09B400A55C3A /* split.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = split.c; sourceTree = "<group>"; };
+		1523B23216EF09B400A55C3A /* split.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
+		1523B23B16EF0A3300A55C3A /* TowCodeAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TowCodeAlertView.h; sourceTree = "<group>"; };
+		1523B23C16EF0A3300A55C3A /* TowCodeAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TowCodeAlertView.m; sourceTree = "<group>"; };
+		1523B23F16EF0C3900A55C3A /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
+		1523B24016EF0C3900A55C3A /* Util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Util.m; sourceTree = "<group>"; };
 		E20611811622705C00FA7720 /* DownloadAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadAlertView.h; sourceTree = "<group>"; };
 		E20611821622705C00FA7720 /* DownloadAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadAlertView.m; sourceTree = "<group>"; };
 		E20611841622797A00FA7720 /* btn_green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn_green.png; sourceTree = "<group>"; };
@@ -444,9 +476,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1523B22116EF097300A55C3A /* QrenCode */ = {
+			isa = PBXGroup;
+			children = (
+				1523B22316EF09B400A55C3A /* bitstream.c */,
+				1523B22416EF09B400A55C3A /* bitstream.h */,
+				1523B22516EF09B400A55C3A /* mask.c */,
+				1523B22616EF09B400A55C3A /* mask.h */,
+				1523B22716EF09B400A55C3A /* QRCodeGenerator.h */,
+				1523B22816EF09B400A55C3A /* QRCodeGenerator.m */,
+				1523B22916EF09B400A55C3A /* qrencode.c */,
+				1523B22A16EF09B400A55C3A /* qrencode.h */,
+				1523B22B16EF09B400A55C3A /* qrinput.c */,
+				1523B22C16EF09B400A55C3A /* qrinput.h */,
+				1523B22D16EF09B400A55C3A /* qrspec.c */,
+				1523B22E16EF09B400A55C3A /* qrspec.h */,
+				1523B22F16EF09B400A55C3A /* rscode.c */,
+				1523B23016EF09B400A55C3A /* rscode.h */,
+				1523B23116EF09B400A55C3A /* split.c */,
+				1523B23216EF09B400A55C3A /* split.h */,
+			);
+			name = QrenCode;
+			sourceTree = "<group>";
+		};
 		E206117D16226FF700FA7720 /* CustomAlert */ = {
 			isa = PBXGroup;
 			children = (
+				1523B23B16EF0A3300A55C3A /* TowCodeAlertView.h */,
+				1523B23C16EF0A3300A55C3A /* TowCodeAlertView.m */,
 				E2C55788162E9CB80044A7F3 /* ProgressAlertView.h */,
 				E2C55789162E9CB80044A7F3 /* ProgressAlertView.m */,
 				E2E3A8851622DBC5001A07D1 /* iToast.h */,
@@ -625,6 +682,8 @@
 				E2DE2A1316784E9A0063E22C /* MyHttpRequest.m */,
 				E2F21949168068B500AF55B8 /* TokenUtil.h */,
 				E2F2194A168068B500AF55B8 /* TokenUtil.m */,
+				1523B23F16EF0C3900A55C3A /* Util.h */,
+				1523B24016EF0C3900A55C3A /* Util.m */,
 			);
 			name = utils;
 			sourceTree = "<group>";
@@ -731,6 +790,7 @@
 		E22750B215EE1C6C002F9A10 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				1523B22116EF097300A55C3A /* QrenCode */,
 				E28341561675B40D000918B4 /* Database */,
 				E22750EF15EE1CA5002F9A10 /* ASIHttprequest */,
 				E227510615EE1CA5002F9A10 /* GTMDefines.h */,
@@ -1132,6 +1192,16 @@
 				E2FB021016E49E23008CC3CB /* iConsole.m in Sources */,
 				E2D6AC6D16EED12000012C5E /* UserInfo.m in Sources */,
 				E2D6AC6E16EED12000012C5E /* UUID.m in Sources */,
+				1523B23316EF09B400A55C3A /* bitstream.c in Sources */,
+				1523B23416EF09B400A55C3A /* mask.c in Sources */,
+				1523B23516EF09B400A55C3A /* QRCodeGenerator.m in Sources */,
+				1523B23616EF09B400A55C3A /* qrencode.c in Sources */,
+				1523B23716EF09B400A55C3A /* qrinput.c in Sources */,
+				1523B23816EF09B400A55C3A /* qrspec.c in Sources */,
+				1523B23916EF09B400A55C3A /* rscode.c in Sources */,
+				1523B23A16EF09B400A55C3A /* split.c in Sources */,
+				1523B23D16EF0A3300A55C3A /* TowCodeAlertView.m in Sources */,
+				1523B24116EF0C3900A55C3A /* Util.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1139,6 +1209,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1523B23E16EF0A3300A55C3A /* TowCodeAlertView.m in Sources */,
+				1523B24216EF0C3900A55C3A /* Util.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
