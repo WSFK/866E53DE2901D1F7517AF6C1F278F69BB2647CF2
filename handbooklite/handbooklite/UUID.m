@@ -24,4 +24,8 @@
     return uuid;
 }
 
++ (NSString *) getDeviceId{
+  NSString *deviceId = [[UIDevice currentDevice] uniqueIdentifier];
+  return deviceId;
+}
 @end

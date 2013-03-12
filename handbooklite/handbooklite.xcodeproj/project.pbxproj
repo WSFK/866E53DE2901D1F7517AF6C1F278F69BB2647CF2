@@ -186,6 +186,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1523B21D16EF07D800A55C3A /* PublicImport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PublicImport.h; sourceTree = "<group>"; };
 		E20611811622705C00FA7720 /* DownloadAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadAlertView.h; sourceTree = "<group>"; };
 		E20611821622705C00FA7720 /* DownloadAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadAlertView.m; sourceTree = "<group>"; };
 		E20611841622797A00FA7720 /* btn_green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn_green.png; sourceTree = "<group>"; };
@@ -563,6 +564,7 @@
 				E2274F7115EDE6A6002F9A10 /* extension */,
 				E2274F6515EDE209002F9A10 /* utils */,
 				E2274F5E15EDDFF4002F9A10 /* handbook */,
+				1523B21D16EF07D800A55C3A /* PublicImport.h */,
 			);
 			name = class;
 			sourceTree = "<group>";

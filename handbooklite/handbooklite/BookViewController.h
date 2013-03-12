@@ -117,7 +117,7 @@
 
 #pragma mark - SCROLLVIEW
 - (CGRect)frameForPage:(int)page;
-- (void)resetScrollView;
+//- (void)resetScrollView;
 
 #pragma mark - WEBVIEW
 - (void)webView:(UIWebView *)webView hidden:(BOOL)status animating:(BOOL)animating;
