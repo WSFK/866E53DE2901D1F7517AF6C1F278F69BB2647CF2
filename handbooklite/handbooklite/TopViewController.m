@@ -183,7 +183,12 @@
 }
 
 - (void)clickShareSelector:(id)sender{
-    
+  //判断有无网络
+  if (![NetWorkCheck checkReachable]) {
+    [self showMessage:@"当前不能连接服务器"];
+    return;
+  }
+
     if ([delegate respondsToSelector:@selector(didShare:)]) {
         [delegate performSelector:@selector(didShare:) withObject:sender];
     }

@@ -100,9 +100,6 @@
 
 - (IBAction)clickEditSelector:(id)sender;
 
-//添加一本手册
-- (void)addBookCell;
-
 //下载列表
 - (IBAction)clickDownloadListSelector:(id)sender;
 

@@ -348,7 +348,7 @@ __VA_ARGS__ \
     
     // ****** Store instances for later use
     //        NSMutableDictionary *details = [NSMutableDictionary dictionaryWithObjectsAndKeys:spinner, @"spinner", number, @"number", title, @"title", backgroundView, @"background", nil];
-    NSMutableDictionary *details = [NSMutableDictionary dictionaryWithObjectsAndKeys:spinner, @"spinner",backgroundView, @"background", nil];
+//    NSMutableDictionary *details = [NSMutableDictionary dictionaryWithObjectsAndKeys:spinner, @"spinner",backgroundView, @"background", nil];
 //    [pageDetails insertObject:details atIndex:i];
   }
 }
@@ -1612,17 +1612,8 @@ __VA_ARGS__ \
 
 //点击显示二维码
 - (void)didTwoCode:(id)sender{
-  NSMutableString *shareUrl = [[NSMutableString alloc] init];
-  [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
-  [shareUrl appendFormat:@"?su=%@",USERUUID];          //参数：分享者id
-  [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
-  [shareUrl appendFormat:@"&downloadnum=%@",currentBook.downnum];          //参数：下载码
-  [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];          //参数：hash
-  
-  UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
-  
   //显示二维码
-  towCodeAlert =[[TowCodeAlertView alloc] initWithContentImage:twImage];
+  towCodeAlert =[[TowCodeAlertView alloc] initWithContentImage:[Util getShareTwoCode:currentBook.downnum]];
   [towCodeAlert setDelegate:self];
   [towCodeAlert show];
 }
@@ -1631,4 +1622,55 @@ __VA_ARGS__ \
 - (void)closeTowCodeAlert{
   towCodeAlert =nil;
 }
+
+//点击分享
+- (void)didShare:(id)sender{
+  //book 的pdf操作
+  NSMutableString *pdfDownUrl = [[NSMutableString alloc] initWithString:BASE_URL];
+  
+  NSString *pdfRequest = [NSString stringWithFormat:@"%@bookid='%@'",PDFREQUEST,currentBook.downnum];
+  NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:pdfRequest] cachePolicy:0 timeoutInterval:10];
+  [request setHTTPMethod:@"GET"];
+  
+  NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+  
+  NSDictionary *json = [data objectFromJSONData];
+  
+  if (json != nil) {
+    [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
+  }
+
+  actionSheet =[ShareActionSheet actionSheetForTarget:self
+                                                              sendImage:[Util getShareTwoCode:currentBook.downnum]
+                                                                sendPdf:pdfDownUrl
+                                                            sendPdfName:currentBook.name];
+  [actionSheet setMailDelegate:self];
+  [actionSheet showInView:self.view];
+}
+
+#pragma mark -SendMailDelegate
+- (void)didSendMailFailure{
+  CCLog(@"send mail failure");
+  [self showMessage:@"邮件发送失败"];
+}
+
+- (void)didSendMailFinished{
+  CCLog(@"send mail finished");
+  [self showMessage:@"分享邮件发送成功"];
+}
+
+- (void)didSendMailCancelled{
+  CCLog(@"send mail cancelled");
+}
+
+- (void)didSaveMailFinished{
+  CCLog(@"send mail save Finished");
+  [self showMessage:@"邮件保存成功"];
+}
+
+- (void)notOpenMail{
+  CCLog(@"not open mail");
+  [self showMessage:@"添加本地Email账户后才可以发送邮件"];
+}
+
 @end

@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "Book.h"
+#import "NetWorkCheck.h"
+#import "UIViewController_Extension.h"
 
 @protocol TopViewDelegate <NSObject>
 

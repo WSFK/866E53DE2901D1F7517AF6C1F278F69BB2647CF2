@@ -14,10 +14,12 @@
 #import "Book.h"
 #import "DrawViewController.h"
 #import "TowCodeAlertView.h"
-#import "QRCodeGenerator.h"
-#import "PublicImport.h"
 
-@interface BookViewController : UIViewController<TopViewDelegate,UIWebViewDelegate, UIScrollViewDelegate,TowCodeAlertDelegate>
+#import "PublicImport.h"
+#import "ShareActionSheet.h"
+
+
+@interface BookViewController : UIViewController<SendMailDelegate,TopViewDelegate,UIWebViewDelegate, UIScrollViewDelegate,TowCodeAlertDelegate>
 {
   CGRect screenBounds;//机器屏幕
 	
@@ -77,6 +79,8 @@
   Book *currentBook;
   Properties *properties;
   TowCodeAlertView *towCodeAlert;
+  
+  ShareActionSheet *actionSheet;
 }
 
 #pragma mark - PROPERTIES

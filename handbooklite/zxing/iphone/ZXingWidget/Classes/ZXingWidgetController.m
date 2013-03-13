@@ -70,9 +70,19 @@
     self.wantsFullScreenLayout = YES;
     beepSound = -1;
     decoding = NO;
-      
-      NSString *version = [UIDevice currentDevice].systemVersion;//判定系统版本。
-      int ver = [[version substringWithRange:NSMakeRange(0, 1)] intValue];
+          
+    OverlayView *theOverLayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
+                                                       cancelEnabled:showCancel
+                                                            oneDMode:oneDMode
+                                                         showLicense:shouldShowLicense];
+    [theOverLayView setDelegate:self];
+    self.overlayView = theOverLayView;
+    [theOverLayView release];
+    
+    /**
+     NSString *version = [UIDevice currentDevice].systemVersion;//判定系统版本。
+     int ver = [[version substringWithRange:NSMakeRange(0, 1)] intValue];
+
       if (ver > 5) {
           OverlayView *theOverLayView = [[OverlayView alloc] initWithFrame:CGRectMake(182,0, 620, 750)
                                                              cancelEnabled:showCancel
@@ -94,7 +104,7 @@
           self.overlayView = theOverLayView;
           [theOverLayView release];
       }
-      
+      **/
     
   }
   
