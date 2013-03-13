@@ -13,6 +13,7 @@
 #import "Util.h"
 #import "Config.h"
 #import "TokenUtil.h"
+#import "JSONKit.h"
 
 #define DEVICEUUID [Util getDeviceId]
 #define USERUUID [UUID getUUIDToString]

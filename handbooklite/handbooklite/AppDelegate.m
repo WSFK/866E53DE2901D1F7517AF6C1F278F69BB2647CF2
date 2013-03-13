@@ -22,7 +22,7 @@
 @synthesize window = _window;
 @synthesize bookShelfViewController = _bookShelfViewController;
 @synthesize navigationController = _navigationController;
-
+@synthesize sinaweibo;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -70,7 +70,19 @@
 //            CCLog(@"------\n%@",fontName);
 //        }
 //    }
-    
+  
+  sinaweibo = [[SinaWeibo alloc] initWithAppKey:kAppKey appSecret:kAppSecret appRedirectURI:kAppRedirectURI andDelegate:nil];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSDictionary *sinaweiboInfo = [defaults objectForKey:@"SinaWeiboAuthData"];
+  if ([sinaweiboInfo objectForKey:@"AccessTokenKey"] && [sinaweiboInfo objectForKey:@"ExpirationDateKey"] && [sinaweiboInfo objectForKey:@"UserIDKey"])
+  {
+    sinaweibo.accessToken = [sinaweiboInfo objectForKey:@"AccessTokenKey"];
+    sinaweibo.expirationDate = [sinaweiboInfo objectForKey:@"ExpirationDateKey"];
+    sinaweibo.userID = [sinaweiboInfo objectForKey:@"UserIDKey"];
+  }
+  
+  [sinaweibo logOut];
+  
     [iConsole sharedConsole].delegate = self;
     [iConsole sharedConsole].logLevel = iConsoleLogLevelWarning;
     [iConsole sharedConsole].logSubmissionEmail = @"hanbing.cn@gmail.com";
