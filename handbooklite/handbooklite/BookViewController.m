@@ -632,18 +632,14 @@ __VA_ARGS__ \
 	return pageChanged;
 }
 - (void)gotoPageDelayer {
-	// This delay is required in order to avoid stuttering when the animation runs.
-	// The animation lasts 0.5 seconds: so we start loading after that.
-  
 	if (currentPageIsDelayingLoading) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(gotoPage) object:nil];
   }
-	
 	currentPageIsDelayingLoading = YES;
 	[self performSelector:@selector(gotoPage) withObject:nil afterDelay:0.1];
 }
+
 - (void)gotoPage {    
-  
   //CCLog(@"---------currentPageNumber:%d",currentPageNumber - 1);
   
   NSString *path = [NSString stringWithString:[pages objectAtIndex:currentPageNumber - 1]];
@@ -963,90 +959,56 @@ __VA_ARGS__ \
 
 #pragma mark - WEBVIEW
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-  
-	// Sent before a web view begins loading content, useful to trigger actions before the WebView.	
+  // Sent before a web view begins loading content, useful to trigger actions before the WebView.	
   NSURL *url = [request URL];
   if ([webView isEqual:prevPage])
-  {
     return YES;
-  } 
   else if ([webView isEqual:nextPage])
-  {
     return YES;
-  } 
-  else if (currentPageIsDelayingLoading)
-  {		
+  else if (currentPageIsDelayingLoading){		
 		currentPageIsDelayingLoading = NO;
     return ![self isIndexView:webView];
-	}
-  else
-  {        
+	}else{        
 		// ****** Handle URI schemes
-		if (url)
-    {
+		if (url){
 			// Existing, checking if index...
-      if([[url relativePath] isEqualToString:[indexViewController indexPath]])
-      {
+      if([[url relativePath] isEqualToString:[indexViewController indexPath]]) {
         CCLog(@"-----just load web is indexViewController");
         return YES;
-      }
-      else
-      {
-        
-        // Not index, checking scheme...
-        if ([[url scheme] isEqualToString:@"file"])
-        {
+      }else{
+        if ([[url scheme] isEqualToString:@"file"]){
           // ****** Handle: file://
           
           anchorFromURL  = [url fragment];
           NSString *file = [[url relativePath] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
           
           int page = [pages indexOfObject:file];
-          if (page == NSNotFound)
-          {
+          if (page == NSNotFound) {
             // ****** Internal link, but not one of the book pages --> load page anyway
             return YES;
           }
           
           page = page + 1;
           //                    
-          if (![self changePage:page] && ![webView isEqual:indexViewController.view]) 
-          {
+          if (![self changePage:page] && ![webView isEqual:indexViewController.view]){
             if (anchorFromURL == nil) {
               return YES;
             }
-            
             [self handleAnchor:YES];                        
           }
-          
-          
         }
-        
       }
-      
-      
     }
-		
 		return NO;
 	}
 }
+
 - (void)webViewDidStartLoad:(UIWebView *)webView {
   //    CCLog(@"• Page did start load");
 }
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-	// Sent if a web view failed to load content.
-  if ([webView isEqual:currPage]) {
-    //		CCLog(@"• CurrPage failed to load content with error: %@", error);
-	} else if ([webView isEqual:prevPage]) {
-    //		CCLog(@"• PrevPage failed to load content with error: %@", error);
-	} else if ([webView isEqual:nextPage]) {
-    //		CCLog(@"• NextPage failed to load content with error: %@", error);
-  }
-}
+
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-  
-  if (webView.hidden == YES)
-  {
+  if (webView.hidden == YES){
     if ([webView isEqual:currPage]) {
       currentPageHasChanged = NO;
       [self getPageHeight];
@@ -1060,9 +1022,7 @@ __VA_ARGS__ \
     } else {
       [self takeScreenshotFromView:webView forPage:currentPageNumber andOrientation:[self getCurrentInterfaceOrientation]];
     }
-    
     [self handlePageLoading];
-    
   }
   [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"WebKitCacheModelPreferenceKey"];
 }
@@ -1084,6 +1044,7 @@ __VA_ARGS__ \
     [self webViewDidAppear:webView animating:animating];
 	}
 }
+
 - (void)webViewDidAppear:(UIWebView *)webView animating:(BOOL)animating {
   
   if ([webView isEqual:currPage])
@@ -1091,8 +1052,7 @@ __VA_ARGS__ \
     [self webView:webView dispatchHTMLEvent:@"focus"];
     
     // If is the first time i load something in the currPage web view...
-    if (currentPageFirstLoading)
-    {
+    if (currentPageFirstLoading){
       // ... check if there is a saved starting scroll index and set it
       NSDictionary *lastIndexDic = (NSDictionary *)[[NSUserDefaults standardUserDefaults] objectForKey:[self getBookName]];
       //[[NSUserDefaults standardUserDefaults] objectForKey:@"lastScrollIndex"]
@@ -1101,13 +1061,12 @@ __VA_ARGS__ \
         [self goDownInPage:currPageScrollIndex animating:YES];
       }
       currentPageFirstLoading = NO;
-    }
-    else
-    {
+    }else{
       [self handleAnchor:YES];
     }
   }
 }
+
 - (void)webView:(UIWebView *)webView dispatchHTMLEvent:(NSString *)event {
   NSString *jsDispatchEvent = [NSString stringWithFormat:@"var bakerDispatchedEvent = document.createEvent('Events');\
                                bakerDispatchedEvent.initEvent('%@', false, false);\
@@ -1118,7 +1077,6 @@ __VA_ARGS__ \
 
 #pragma mark - SCREENSHOTS
 - (void)initScreenshots {
-  
   NSMutableSet *completeSet = [NSMutableSet new];
   NSMutableSet *supportSet  = [NSMutableSet new]; 
   
@@ -1155,8 +1113,9 @@ __VA_ARGS__ \
     [[attachedScreenshot objectForKey:num] removeFromSuperview];
     [attachedScreenshot removeObjectForKey:num];
   }
-  
 }
+
+// 判断当前页是否已经截屏
 - (BOOL)checkScreeshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
   
   if (![[NSFileManager defaultManager] fileExistsAtPath:cachedScreenshotsPath]) {
@@ -1167,6 +1126,9 @@ __VA_ARGS__ \
   NSString *screenshotFile = [cachedScreenshotsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"screenshot-%@-%i.jpg", interfaceOrientation, pageNumber]];
   return [[NSFileManager defaultManager] fileExistsAtPath:screenshotFile];
 }
+
+
+//
 - (void)takeScreenshotFromView:(UIWebView *)webView forPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
   
   BOOL shouldRevealWebView = YES;
@@ -1201,6 +1163,9 @@ __VA_ARGS__ \
     [self webView:webView hidden:NO animating:animating];
   }
 }
+
+
+//
 - (void)placeScreenshotForView:(UIWebView *)webView andPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
   
   int i = pageNumber - 1;
@@ -1257,6 +1222,7 @@ __VA_ARGS__ \
   }
   
 }
+
 
 #pragma mark - GESTURES
 - (void)userDidTap:(UITouch *)touch {
@@ -1440,6 +1406,17 @@ __VA_ARGS__ \
     return YES;
   }
 }
+
+- (BOOL)shouldAutorotate
+{
+  return YES;
+}
+-(NSUInteger)supportedInterfaceOrientations
+{
+  return UIInterfaceOrientationMaskLandscape;
+}
+
+
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
   // Notify the index view
   CCLog(@"----------Notify the index view  out");

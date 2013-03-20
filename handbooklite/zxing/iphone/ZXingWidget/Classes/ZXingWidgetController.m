@@ -355,76 +355,76 @@ static bool isIPad() {
 - (void)initCapture {
 #if HAS_AVFF
   AVCaptureDevice* inputDevice =
-    [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+  [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
   AVCaptureDeviceInput *captureInput =
-    [AVCaptureDeviceInput deviceInputWithDevice:inputDevice error:nil];
-  AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init]; 
-  captureOutput.alwaysDiscardsLateVideoFrames = YES; 
+  [AVCaptureDeviceInput deviceInputWithDevice:inputDevice error:nil];
+  AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+  captureOutput.alwaysDiscardsLateVideoFrames = YES;
   [captureOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
-  NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey; 
-  NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA]; 
-  NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:key]; 
-  [captureOutput setVideoSettings:videoSettings]; 
+  NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
+  NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
+  NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:key];
+  [captureOutput setVideoSettings:videoSettings];
   self.captureSession = [[[AVCaptureSession alloc] init] autorelease];
-
+  
   NSString* preset = 0;
   if (NSClassFromString(@"NSOrderedSet") && // Proxy for "is this iOS 5" ...
       [UIScreen mainScreen].scale > 1 &&
-      isIPad() && 
+      isIPad() &&
       [inputDevice
-        supportsAVCaptureSessionPreset:AVCaptureSessionPresetiFrame960x540]) {
-    // NSLog(@"960");
-    preset = AVCaptureSessionPresetiFrame960x540;
-  }
+       supportsAVCaptureSessionPreset:AVCaptureSessionPresetiFrame960x540]) {
+        // NSLog(@"960");
+        preset = AVCaptureSessionPresetiFrame960x540;
+      }
   if (!preset) {
     // NSLog(@"MED");
     preset = AVCaptureSessionPresetMedium;
   }
   self.captureSession.sessionPreset = preset;
-
+  
   [self.captureSession addInput:captureInput];
   [self.captureSession addOutput:captureOutput];
-
+  
   [captureOutput release];
-
-/*
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(stopPreview:)
-  name:AVCaptureSessionDidStopRunningNotification
-  object:self.captureSession];
-
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(notification:)
-  name:AVCaptureSessionDidStopRunningNotification
-  object:self.captureSession];
-
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(notification:)
-  name:AVCaptureSessionRuntimeErrorNotification
-  object:self.captureSession];
-
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(notification:)
-  name:AVCaptureSessionDidStartRunningNotification
-  object:self.captureSession];
-
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(notification:)
-  name:AVCaptureSessionWasInterruptedNotification
-  object:self.captureSession];
-
-  [[NSNotificationCenter defaultCenter]
-  addObserver:self
-  selector:@selector(notification:)
-  name:AVCaptureSessionInterruptionEndedNotification
-  object:self.captureSession];
-*/
-
+  
+  /*
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(stopPreview:)
+   name:AVCaptureSessionDidStopRunningNotification
+   object:self.captureSession];
+   
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(notification:)
+   name:AVCaptureSessionDidStopRunningNotification
+   object:self.captureSession];
+   
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(notification:)
+   name:AVCaptureSessionRuntimeErrorNotification
+   object:self.captureSession];
+   
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(notification:)
+   name:AVCaptureSessionDidStartRunningNotification
+   object:self.captureSession];
+   
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(notification:)
+   name:AVCaptureSessionWasInterruptedNotification
+   object:self.captureSession];
+   
+   [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(notification:)
+   name:AVCaptureSessionInterruptionEndedNotification
+   object:self.captureSession];
+   */
+  
   if (!self.prevLayer) {
     self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
   }
@@ -432,7 +432,7 @@ static bool isIPad() {
   self.prevLayer.frame = self.view.bounds;
   self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
   [self.view.layer addSublayer: self.prevLayer];
-
+  
   [self.captureSession startRunning];
 #endif
 }

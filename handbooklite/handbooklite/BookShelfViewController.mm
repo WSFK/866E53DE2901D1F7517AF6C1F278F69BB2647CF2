@@ -74,7 +74,6 @@
 
 - (void)viewDidLoad
 {
- 
     [self.lbTitle setFont:[UIFont fontWithName:@"Microsoft YaHei" size:16]];
     [self.lbTitle setTextAlignment:UITextAlignmentRight];
     [self.lbTitle setTextColor:[UIColor whiteColor]];
@@ -130,7 +129,6 @@
     [self.view insertSubview:downloadListView.view belowSubview:leftMenuImgView];
     [downloadListView setViewHidden:YES withAnimation:NO];
     
-    
     NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
     NSString *prompt =[defaults objectForKey:@"prompt"];
     if (![prompt isEqualToString:@"YES"]) {
@@ -148,7 +146,9 @@
     [self.view addGestureRecognizer:swipeRight];
     
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+  //注册推送接受通知
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showPushMessage:) name:@"push_notification" object:nil];
+  
 }
 
 //接受推送数据的提示
@@ -212,14 +212,8 @@
     [_myWindow setDisableTap:YES];
     //取消编辑
     [self cancelEdit];
-  //注册推送接受通知
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showPushMessage:) name:@"push_notification" object:nil];
 }
 
-- (void)viewWillDisappear:(BOOL)animated{
-    
-    [super viewWillDisappear:animated];
-}
 
 - (void)viewDidUnload
 {
@@ -258,6 +252,15 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
 	return [self orientationByString:ORIENTATION InterfaceOrientation:interfaceOrientation];
+}
+
+- (BOOL)shouldAutorotate
+{
+  return YES;
+}
+-(NSUInteger)supportedInterfaceOrientations
+{
+  return UIInterfaceOrientationMaskLandscape;
 }
 
 //列表
@@ -499,7 +502,15 @@
 
 //点击拍照按钮
 - (void)scanClickSelector:(id)sender{
+  //显示二维码
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTwoCodeResult:) name:@"TWOCODEWITHRRESULT" object:nil];
+  TwoCapture *tc = [TwoCapture newInstence];
+  tc.isSendTwoCodeNoti = NO;
     
+  UIViewController *cap = [[NSClassFromString(@"CaptureViewController") alloc] initWithNibName:@"CaptureViewController" bundle:nil];
+  [self presentModalViewController:cap animated:YES];
+  
+  /**
     ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self 
                                                                                 showCancel:YES 
                                                                                   OneDMode:NO];
@@ -511,6 +522,25 @@
     widController.soundToPlay =
     [NSURL fileURLWithPath:[mainBundle pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
     [self presentModalViewController:widController animated:YES];
+   **/
+}
+
+#pragma mark -- new Zxing Function
+-(void) showTwoCodeResult:(NSNotification *)notifi{
+  [self dismissModalViewControllerAnimated:YES];
+  
+  TwoCapture *tc = [TwoCapture newInstence];
+  if (tc.isSendTwoCodeNoti) {
+    //显示二维码
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"TWOCODEWITHRRESULT" object:nil];
+    tc.isSendTwoCodeNoti = NO;
+    NSString *result = [notifi object];
+    //解析二维码
+    paramTemp =[self tempFromString:result];
+    //提示是否立刻下载
+    [self showImmediatelyDownloadAlert];
+  }
+  
 }
 
 #pragma mark-ZXingDelegate

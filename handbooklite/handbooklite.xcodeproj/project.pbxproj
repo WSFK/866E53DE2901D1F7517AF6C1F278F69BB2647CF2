@@ -34,6 +34,12 @@
 		1523B26B16EF26D500A55C3A /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1523B26A16EF26D500A55C3A /* MessageUI.framework */; };
 		156B192516F057BD00FC218A /* SinaWeibo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 156B192416F057BD00FC218A /* SinaWeibo.bundle */; };
 		156B192616F057BD00FC218A /* SinaWeibo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 156B192416F057BD00FC218A /* SinaWeibo.bundle */; };
+		158DA84E16F2ECBF00C1B23A /* CaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 158DA84C16F2ECBF00C1B23A /* CaptureViewController.mm */; };
+		158DA84F16F2ECBF00C1B23A /* CaptureViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 158DA84D16F2ECBF00C1B23A /* CaptureViewController.xib */; };
+		158DA86116F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m in Sources */ = {isa = PBXBuildFile; fileRef = 158DA86016F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m */; };
+		158DA86216F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m in Sources */ = {isa = PBXBuildFile; fileRef = 158DA86016F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m */; };
+		158DA86716F339BB00C1B23A /* TwoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 158DA86616F339BB00C1B23A /* TwoCapture.m */; };
+		158DA86816F339BB00C1B23A /* TwoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 158DA86616F339BB00C1B23A /* TwoCapture.m */; };
 		E20611831622705C00FA7720 /* DownloadAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E20611821622705C00FA7720 /* DownloadAlertView.m */; };
 		E20611851622797B00FA7720 /* btn_green.png in Resources */ = {isa = PBXBuildFile; fileRef = E20611841622797A00FA7720 /* btn_green.png */; };
 		E2061188162294AC00FA7720 /* WaitAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2061187162294AB00FA7720 /* WaitAlertView.m */; };
@@ -250,6 +256,14 @@
 		1523B26A16EF26D500A55C3A /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		156B192016F0537900FC218A /* SendMailDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SendMailDelegate.h; sourceTree = "<group>"; };
 		156B192416F057BD00FC218A /* SinaWeibo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SinaWeibo.bundle; sourceTree = "<group>"; };
+		158DA84B16F2ECBF00C1B23A /* CaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureViewController.h; sourceTree = "<group>"; };
+		158DA84C16F2ECBF00C1B23A /* CaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CaptureViewController.mm; sourceTree = "<group>"; };
+		158DA84D16F2ECBF00C1B23A /* CaptureViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CaptureViewController.xib; sourceTree = "<group>"; };
+		158DA85F16F32DF600C1B23A /* UINavigationController+Rotation_IOS6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+Rotation_IOS6.h"; sourceTree = "<group>"; };
+		158DA86016F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+Rotation_IOS6.m"; sourceTree = "<group>"; };
+		158DA86416F3351E00C1B23A /* CaptureViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureViewControllerDelegate.h; sourceTree = "<group>"; };
+		158DA86516F339BB00C1B23A /* TwoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoCapture.h; sourceTree = "<group>"; };
+		158DA86616F339BB00C1B23A /* TwoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoCapture.m; sourceTree = "<group>"; };
 		E20611811622705C00FA7720 /* DownloadAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadAlertView.h; sourceTree = "<group>"; };
 		E20611821622705C00FA7720 /* DownloadAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadAlertView.m; sourceTree = "<group>"; };
 		E20611841622797A00FA7720 /* btn_green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn_green.png; sourceTree = "<group>"; };
@@ -634,11 +648,17 @@
 		E2274F2915EDBEC4002F9A10 /* handbooklite */ = {
 			isa = PBXGroup;
 			children = (
+				158DA85F16F32DF600C1B23A /* UINavigationController+Rotation_IOS6.h */,
+				158DA86016F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m */,
 				E2274F6415EDE057002F9A10 /* view */,
 				E2274F5C15EDDFD7002F9A10 /* class */,
 				E2274F3215EDBEC4002F9A10 /* AppDelegate.h */,
 				E2274F3315EDBEC4002F9A10 /* AppDelegate.m */,
 				E2274F2A15EDBEC4002F9A10 /* Supporting Files */,
+				158DA84B16F2ECBF00C1B23A /* CaptureViewController.h */,
+				158DA84C16F2ECBF00C1B23A /* CaptureViewController.mm */,
+				158DA84D16F2ECBF00C1B23A /* CaptureViewController.xib */,
+				158DA86416F3351E00C1B23A /* CaptureViewControllerDelegate.h */,
 			);
 			path = handbooklite;
 			sourceTree = "<group>";
@@ -747,6 +767,8 @@
 				E2F2194A168068B500AF55B8 /* TokenUtil.m */,
 				1523B23F16EF0C3900A55C3A /* Util.h */,
 				1523B24016EF0C3900A55C3A /* Util.m */,
+				158DA86516F339BB00C1B23A /* TwoCapture.h */,
+				158DA86616F339BB00C1B23A /* TwoCapture.m */,
 			);
 			name = utils;
 			sourceTree = "<group>";
@@ -1164,6 +1186,7 @@
 				E2D6AC6616EECF2000012C5E /* towcode.png in Resources */,
 				E2D6AC6716EECF2000012C5E /* towcode@2x.png in Resources */,
 				156B192516F057BD00FC218A /* SinaWeibo.bundle in Resources */,
+				158DA84F16F2ECBF00C1B23A /* CaptureViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1274,6 +1297,9 @@
 				1523B26416EF1E4B00A55C3A /* ShareActionSheet.m in Sources */,
 				1523B26616EF1E4B00A55C3A /* ShareAlertView.m in Sources */,
 				1523B26816EF1E4B00A55C3A /* SinaweiboShare.m in Sources */,
+				158DA84E16F2ECBF00C1B23A /* CaptureViewController.mm in Sources */,
+				158DA86116F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m in Sources */,
+				158DA86716F339BB00C1B23A /* TwoCapture.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1289,6 +1315,8 @@
 				1523B26516EF1E4B00A55C3A /* ShareActionSheet.m in Sources */,
 				1523B26716EF1E4B00A55C3A /* ShareAlertView.m in Sources */,
 				1523B26916EF1E4B00A55C3A /* SinaweiboShare.m in Sources */,
+				158DA86216F32DF600C1B23A /* UINavigationController+Rotation_IOS6.m in Sources */,
+				158DA86816F339BB00C1B23A /* TwoCapture.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1336,8 +1364,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: ZHU JIN DA (ABWZU537S2)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: ZHU JIN DA (ABWZU537S2)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHU DA";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHU DA";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1353,8 +1381,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "032C6BA7-7F5A-481E-821E-7BD70799EADA";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "032C6BA7-7F5A-481E-821E-7BD70799EADA";
+				PROVISIONING_PROFILE = "BC89D59D-EF12-4F18-A428-EBA7660C6684";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BC89D59D-EF12-4F18-A428-EBA7660C6684";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
@@ -1369,8 +1397,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: ZHU JIN DA (ABWZU537S2)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: ZHU JIN DA (ABWZU537S2)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHU DA";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHU DA";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1380,8 +1408,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "032C6BA7-7F5A-481E-821E-7BD70799EADA";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "032C6BA7-7F5A-481E-821E-7BD70799EADA";
+				PROVISIONING_PROFILE = "BC89D59D-EF12-4F18-A428-EBA7660C6684";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BC89D59D-EF12-4F18-A428-EBA7660C6684";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = YES;

@@ -21,6 +21,8 @@
 #import "CostomAlertView.h"
 #import "DownloadListViewController.h"
 #import "Temp.h"
+#import "Properties.h"
+#import "TwoCapture.h"
 
 @interface BookShelfViewController : UIViewController<ASIHTTPRequestDelegate,ZXingDelegate,MMGridViewDelegate,MMGridViewDataSource,DownloadAlertViewDelegate,DownloadUtilDelegate,CostomAlertViewDelegate,UIAlertViewDelegate,DownloadListViewDelegate>{
     

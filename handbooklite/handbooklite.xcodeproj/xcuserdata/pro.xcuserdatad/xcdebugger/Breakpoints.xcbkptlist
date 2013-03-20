@@ -7,32 +7,6 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "handbooklite/BookViewController.m"
-         timestampString = "384432941.25256"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "650"
-         endingLineNumber = "650"
-         landmarkName = "-gotoPage"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "handbooklite/BookViewController.m"
-         timestampString = "384432941.25256"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "920"
-         endingLineNumber = "920"
-         landmarkName = "-loadWebView:withPage:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "handbooklite/PaintView.m"
          timestampString = "384674675.550836"
          startingColumnNumber = "9223372036854775807"
@@ -53,32 +27,6 @@
          startingLineNumber = "20"
          endingLineNumber = "20"
          landmarkName = "+actionSheetForTarget:sendImage:sendPdf:sendPdfName:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "handbooklite/BookViewController.m"
-         timestampString = "384772454.230551"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1635"
-         endingLineNumber = "1635"
-         landmarkName = "-didShare:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "handbooklite/BookViewController.m"
-         timestampString = "384772465.764203"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1629"
-         endingLineNumber = "1629"
-         landmarkName = "-didShare:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -183,6 +131,32 @@
          startingLineNumber = "114"
          endingLineNumber = "114"
          landmarkName = "-mailComposeController:didFinishWithResult:error:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "zxing/iphone/ZXingWidget/Classes/ZXingWidgetController.m"
+         timestampString = "384852687.228886"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "432"
+         endingLineNumber = "432"
+         landmarkName = "-initCapture"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "handbooklite/BookShelfViewController.mm"
+         timestampString = "385039936.443809"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "78"
+         endingLineNumber = "78"
+         landmarkName = "-viewDidLoad"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

@@ -134,9 +134,11 @@
 
 #pragma mark - SCREENSHOTS
 - (void)initScreenshots;
+
 - (BOOL)checkScreeshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
 - (void)takeScreenshotFromView:(UIWebView *)webView forPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
 - (void)placeScreenshotForView:(UIWebView *)webView andPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
+
 
 #pragma mark - GESTURES
 - (void)userDidTap:(UITouch *)touch;
