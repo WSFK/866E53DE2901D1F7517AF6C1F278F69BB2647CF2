@@ -747,13 +747,10 @@
 				E22750A215EE1526002F9A10 /* Properties.m */,
 				E2F21949168068B500AF55B8 /* TokenUtil.h */,
 				E2F2194A168068B500AF55B8 /* TokenUtil.m */,
-<<<<<<< HEAD
 				1523B23F16EF0C3900A55C3A /* Util.h */,
 				1523B24016EF0C3900A55C3A /* Util.m */,
-=======
 				E2D2405B16F2F6A900DC0CE7 /* VerifyHandle.h */,
 				E2D2405C16F2F6A900DC0CE7 /* VerifyHandle.m */,
->>>>>>> 提交最新代码2013-03-20
 			);
 			name = utils;
 			sourceTree = "<group>";
@@ -1176,9 +1173,7 @@
 				E2D6AC6516EECF2000012C5E /* share@2x.png in Resources */,
 				E2D6AC6616EECF2000012C5E /* towcode.png in Resources */,
 				E2D6AC6716EECF2000012C5E /* towcode@2x.png in Resources */,
-<<<<<<< HEAD
 				156B192516F057BD00FC218A /* SinaWeibo.bundle in Resources */,
-=======
 				E2E72FF216F717A1006EC987 /* suspend.png in Resources */,
 				E2E72FF316F717A1006EC987 /* suspend@2x.png in Resources */,
 				E2E72FF416F717A1006EC987 /* new.png in Resources */,
@@ -1189,7 +1184,6 @@
 				E2CE0DA316F95E5F0036BE8F /* code_error@2x.png in Resources */,
 				E2CE0DA416F95E5F0036BE8F /* default_icon.png in Resources */,
 				E2CE0DA516F95E5F0036BE8F /* default_icon@2x.png in Resources */,
->>>>>>> 提交最新代码2013-03-20
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1279,7 +1273,6 @@
 				E2FB021016E49E23008CC3CB /* iConsole.m in Sources */,
 				E2D6AC6D16EED12000012C5E /* UserInfo.m in Sources */,
 				E2D6AC6E16EED12000012C5E /* UUID.m in Sources */,
-<<<<<<< HEAD
 				1523B23316EF09B400A55C3A /* bitstream.c in Sources */,
 				1523B23416EF09B400A55C3A /* mask.c in Sources */,
 				1523B23516EF09B400A55C3A /* QRCodeGenerator.m in Sources */,
@@ -1296,9 +1289,7 @@
 				1523B26416EF1E4B00A55C3A /* ShareActionSheet.m in Sources */,
 				1523B26616EF1E4B00A55C3A /* ShareAlertView.m in Sources */,
 				1523B26816EF1E4B00A55C3A /* SinaweiboShare.m in Sources */,
-=======
 				E2D2405D16F2F6A900DC0CE7 /* VerifyHandle.m in Sources */,
->>>>>>> 提交最新代码2013-03-20
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
