@@ -12,7 +12,15 @@
 
 @interface Util : NSObject
 + (NSString *) getDeviceId;   //获取设备id
+
 +(NSString*) getDayString;    //获取当前时间字符串
+
 +(UIImage *) getShareTwoCode:(NSString *) currentBookDownNum; //获取分享用二维码
+
+/**
+ 记录日志
+ 参数：使用者id，记录类型:打开推送、打开新增，打开书的id
+ **/
++(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId;
 
 @end

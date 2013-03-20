@@ -34,4 +34,24 @@
   UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
   return twImage;
 }
+
++(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if (![fm fileExistsAtPath:LOGFILEPATH]) {
+    [@"" writeToFile:LOGFILEPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  }
+  
+  NSString *logString = [NSString stringWithContentsOfFile:LOGFILEPATH encoding:NSUTF8StringEncoding error:nil];
+  NSDictionary *logDict = [logString objectFromJSONString];
+  NSMutableArray *logArray = [[NSMutableArray alloc] init];
+  if ([logDict objectForKey:@"logs"] != nil) {
+    [logArray addObjectsFromArray:[logDict objectForKey:@"logs"]];
+  }
+  NSDictionary *log = @{@"logtime":[self getDayString],@"uid":Uid,@"type":Utype,@"bookid":BookId};
+  [logArray addObject:[log JSONString]];
+  
+  NSString *outLog = [NSString stringWithFormat:@"{\"logs\":%@}", [logArray JSONString] ];
+  [outLog writeToFile:LOGFILEPATH atomically:YES];
+}
+
 @end

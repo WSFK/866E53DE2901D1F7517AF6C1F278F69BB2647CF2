@@ -20,7 +20,6 @@
 #define BASE_URL @"http://192.168.1.102:8085/"
 //#define BASE_URL @"http://ms.thoughtfactory.com.cn/"
 //#define BASE_URL [[[UIDevice currentDevice] model] isEqualToString:@"iPad Simulator"]?@"http://192.168.1.100:8085/":@"http://ms.thoughtfactory.com.cn/"
-<<<<<<< HEAD
 
 #define DOWNLOAD_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_bookInfo"]
 //请求pdf下载地址
@@ -29,8 +28,8 @@
 #define WEBHELP [NSString stringWithFormat:@"%@help",BASE_URL]
 //四维册阅读版appstore中下载地址
 #define HANDBOOKLITEAPPSTORE  @"https://itunes.apple.com/us/app/si-wei-ce-yue-du/id573415099?mt=8"
-=======
+
 #define VERIFY_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_bookInfo"]
->>>>>>> 提交最新代码2013-03-20
+
 
 #define HELP_DOWNNUM @"TFFLHELP"

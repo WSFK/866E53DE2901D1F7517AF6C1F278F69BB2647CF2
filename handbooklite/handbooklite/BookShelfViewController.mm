@@ -17,6 +17,8 @@
 #import "HttpHeader.h"
 #import "TokenUtil.h"
 #import "PublicImport.h"
+#import "PushMsg.h"
+#import "PushMsgAlert.h"
 
 @interface BookShelfViewController ()
 
@@ -53,15 +55,13 @@
 
 @synthesize contactUsView =_contactUsView;
 
-@synthesize paramBookDic =_paramBookDic;
+@synthesize downloadTempDic =_downloadTempDic;
 
 @synthesize verifyHandle;
 
 #define BOOK_CELL_NUMBER 5
 #define BOOKS_DIRECTOR @"books"
 #define SCREENSHOT_DIRECTOR @"wsyd-screenshots"
-
-#define ALERT_DOWNLOAD_TAG 1001
 #define ALERT_3G_TAG 1002
 #define ALERT_PUSH_DOWNLOAD 1004
 
@@ -70,9 +70,6 @@
 
 #define STATUS_DIC_KEY          @"status"
 #define OPEN_STATUS_DIC_KEY     @"openstatus"
-#define PUSH_STATUS_DIC_KEY     @"pushstatus"
-#define PUSH_NUMBER_DIC_KEY     @"pushnumber"
-#define PUSH_MESSAGE_DIC_KEY    @"pushmessage"
 
 
 #define CELL_EMPTY_DIC_KEY      @"celltype"
@@ -140,8 +137,14 @@
                                              selector:@selector(openOrAddBook:)
                                                  name:@"open_or_add_notification"
                                                object:nil];
-    
-    
+  
+  //注册推送接受通知
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(showPushMessage:)
+                                               name:@"push_notification"
+                                             object:nil];
+
+  
     //初始化联系我们
     _contactUsView =[[ContactUsViewController alloc]
                      initWithNibName:@"ContactUsViewController"
@@ -206,9 +209,6 @@
             
             [statusDic setObject:[book status] forKey:STATUS_DIC_KEY];
             [statusDic setObject:[book openstatus] forKey:OPEN_STATUS_DIC_KEY];
-            [statusDic setObject:STATUS_PUSH_NO forKey:PUSH_STATUS_DIC_KEY];
-            [statusDic setObject:@"0" forKey:PUSH_NUMBER_DIC_KEY];
-            [statusDic setObject:@"" forKey:PUSH_MESSAGE_DIC_KEY];
             [statusDic setObject:CELL_EMPTY_NO forKey:CELL_EMPTY_DIC_KEY];
             
         }else{
@@ -221,39 +221,54 @@
     
 }
 
-
-
-
-
-
-
-
-
-
-
 //接受推送数据的提示
 - (void)showPushMessage:(NSNotification *)notifi{
+  
+  NSDictionary *pushData =[notifi object];
+  
+  NSString *msg =[pushData objectForKey:@"message"];
+  NSString *downnum =[pushData objectForKey:@"downnum"];
+  
+  //判断是否有手册
+  if ([DBUtils isExistBookByDownnum:downnum]) {
     
-    NSDictionary *pushData =[notifi object];
-    paramPushData =pushData;
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_OF_PUSH_MSG_TO_SHOW object:pushData];
     
-    NSString *msg =[paramPushData objectForKey:@"message"];
-    NSString *downnum =[paramPushData objectForKey:@"downnum"];
-    NSString *message =[NSString stringWithFormat:@"%@\n手册下载码:%@",msg,downnum];
+  }else{
     
-    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"四维册推送"
-                                                   message:message
+    
+    PushMsgAlert *alert =[self createPushMsgAlert:msg withPushDownnum:downnum];
+    [alert show];
+    
+  }
+  
+}
+
+- (PushMsgAlert *)createPushMsgAlert:(NSString *)msg withPushDownnum:(NSString *)pushDownnum{
+  
+  PushMsgAlert *alert =[[PushMsgAlert alloc] initWithTitle:@"四维册推送"
+                                                   message:msg
                                                   delegate:self
                                          cancelButtonTitle:@"取  消"
                                          otherButtonTitles:@"确  定", nil];
-    [alert setTag:ALERT_PUSH_DOWNLOAD];
-    [alert show];
+  [alert setTag:ALERT_PUSH_DOWNLOAD];
+  [alert setPushDownnum:pushDownnum];
+  
+  return alert;
+}
+
+- (void)showPushAlert:(NSMutableArray *)pushMsgs{
+  
+  for (PushMsg *pm in pushMsgs) {
     
+    PushMsgAlert *alert =[self createPushMsgAlert:pm.msg withPushDownnum:pm.msg];
+    [alert show];
+  }
 }
 
 
 - (void)showPromptAlert{
-    
+  
     promptAlert =[[CostomAlertView alloc] initWithMessage:@"是否要下载本软件的使用帮助手册?"];
     [promptAlert setDelegate:self];
     [promptAlert show];
@@ -284,8 +299,6 @@
     [_myWindow setDisableTap:YES];
     //取消编辑
     [self cancelEdit];
-  //注册推送接受通知
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showPushMessage:) name:@"push_notification" object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -317,7 +330,7 @@
     
     self.progress =nil;
     
-    self.paramBookDic =nil;
+    self.downloadTempDic =nil;
     
 }
 
@@ -332,17 +345,6 @@
 	return [self orientationByString:ORIENTATION InterfaceOrientation:interfaceOrientation];
 }
 
-
-
-
-
-
-
-
-
-
-
-
 //列表显示的个数  包括空位
 #pragma - MMGridViewDataSource
 
@@ -352,16 +354,11 @@
     [_books count]+(BOOK_CELL_NUMBER-([_books count]%BOOK_CELL_NUMBER)):[_books count]+BOOK_CELL_NUMBER;
 }
 
-
-
-
-
 //初始化书架上面的手册
 #pragma - MMGridViewDataSource
 - (MMGridViewCell *)gridView:(MMGridView *)gridView cellAtIndex:(NSUInteger)index
 {
-    
-    
+
     BookCellView *cell = [[BookCellView alloc] initWithFrame:CGRectNull andIndex:index];
     
     [cell setIsClick:YES];
@@ -478,7 +475,12 @@
             
         }
         
+      if ([STATUS_downloading_suspend isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
         
+        [cell.suspendView setHidden:NO];
+        [cell.lbdling setHidden:YES];
+      }
+      
         [cell reloadBookIcon:cell iconImage:iconImage];
         
         cell.title.text =name;
@@ -495,7 +497,8 @@
     }
     
     [cell showDeleteBtn:self.gridView.edit];
-    
+  NSUInteger pushCount =[DBUtils queryCountOfPushMsgByDownnum:[book downnum]];
+  [cell showPushNumber:pushCount];
     return cell;
 }
 
@@ -536,7 +539,7 @@
             
             if (![DBUtils isHasStatusDownloading]) {
                 
-                [self startDownload:book atIndex:index];
+                [self checkNetWorkToDownload:book index:index];
             }
             return;
         }
@@ -565,6 +568,21 @@
     
 }
 
+//所有下载方法    统一调用这个方法
+- (void)startDownloadAction{
+  
+  if (self.downloadTempDic) {
+    
+    Book *book =[self.downloadTempDic objectForKey:@"book"];
+    NSNumber *num =[self.downloadTempDic objectForKey:@"index"];
+    NSUInteger index =[num intValue];
+    
+    [self startDownload:book atIndex:index];
+    
+  }
+}
+
+
 - (void)startDownload:(Book *)book atIndex:(NSUInteger)index{
     
     [DBUtils updateBookStatus:STATUS_downloading downnum:[book downnum]];
@@ -592,6 +610,23 @@
     }
     
     [self queryBookList];
+}
+
+#pragma -mark MMGridViewDelegate  点击推送数字
+- (void)gridView:(MMGridView *)gridView didPushNumberShowCell:(MMGridViewCell *)cell{
+  
+  BookCellView *bookCell =(BookCellView *)cell;
+  
+  NSMutableArray *pushMsgs =[DBUtils queryPushMsgByDownnum:bookCell.downnum];
+  
+  [self showPushAlert:pushMsgs];
+  
+  //清空记录
+  [DBUtils deletePushMsgByDownnum:bookCell.downnum];
+  
+  NSUInteger pushCount =[DBUtils queryCountOfPushMsgByDownnum:bookCell.downnum];
+  [bookCell showPushNumber:pushCount];
+  
 }
 
 - (void)setEdit:(BOOL)isEdit{
@@ -679,14 +714,6 @@
 }
 
 
-
-
-
-
-
-
-
-
 //初始化MMGridView
 - (void)setUpMMGridView{
     
@@ -705,19 +732,6 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //显示拍照 或者 录码 对话框
 - (void)showDownloadAlertView{
     
@@ -733,7 +747,7 @@
 
 #pragma -mark DownloadAlertViewDelegate
 - (void)goPhotoView{
-    [self toScanView];
+   [self toScanView];
 }
 
 #pragma -mark DownloadAlertViewDelegate
@@ -756,66 +770,57 @@
 }
 
 - (void)toScanView{
-    
-    ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self
-                                                                                showCancel:YES
-                                                                                  OneDMode:NO];
-    QRCodeReader* qrcodeReader = [[QRCodeReader alloc] init];
-    NSSet *readers = [[NSSet alloc ] initWithObjects:qrcodeReader,nil];
-    widController.readers = readers;
-    NSBundle *mainBundle = [NSBundle mainBundle];
-    //声音播放
-    widController.soundToPlay =
-    [NSURL fileURLWithPath:[mainBundle pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
-    [self presentModalViewController:widController animated:YES];
+  
+  //显示二维码
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTwoCodeResult:) name:@"TWOCODEWITHRRESULT" object:nil];
+  TwoCapture *tc = [TwoCapture newInstence];
+  tc.isSendTwoCodeNoti = NO;
+  
+  UIViewController *cap = [[NSClassFromString(@"CaptureViewController") alloc] initWithNibName:@"CaptureViewController" bundle:nil];
+  [self presentModalViewController:cap animated:YES];
 }
 
-#pragma mark-ZXingDelegate
-- (void)zxingControllerDidCancel:(ZXingWidgetController *)controller{
-    
-    [self dismissModalViewControllerAnimated:YES];
+#pragma mark -- new Zxing Function
+-(void) showTwoCodeResult:(NSNotification *)notifi{
+  [self dismissModalViewControllerAnimated:YES];
+  
+  TwoCapture *tc = [TwoCapture newInstence];
+  if (tc.isSendTwoCodeNoti) {
+    //显示二维码
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"TWOCODEWITHRRESULT" object:nil];
+    tc.isSendTwoCodeNoti = NO;
+    NSString *result = [notifi object];
+    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result] afterDelay:1.0];
+  }
+  
 }
-
-#pragma mark-ZXingDelegate
-- (void)zxingController:(ZXingWidgetController *)controller didScanResult:(NSString *)result{
-    if (self.isViewLoaded) {
-        /**
-         例子：http://ms.thoughtfactory.com.cn/client/interface_qxz?downloadnum=TFFLHELP&su=123
-         
-         解析后：wsydlite://www.wsyd.com?downloadnum=TFFLHELP&su=123
-         */
-        //解析二维码
-        
-        [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result] afterDelay:1.0];
-        
-    }
-    [self dismissModalViewControllerAnimated:NO];
-}
-
-
 
 #pragma -mark UIAlertViewDelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+  
+  if (alertView.tag==ALERT_3G_TAG && buttonIndex == 1) {
+    [self performSelector:@selector(startDownloadAction) withObject:nil afterDelay:0.5];
+  }
+  
+  else if(alertView.tag == ALERT_PUSH_DOWNLOAD){
     
-    if (alertView.tag==ALERT_3G_TAG && buttonIndex == 1) {
-        [self performSelector:@selector(downloadBook:) withObject:_paramBookDic afterDelay:0.5];
+    if (buttonIndex == 1) {
+      //下载推送过来的手册
+      
+      PushMsgAlert *alert =(PushMsgAlert *)alertView;
+      
+      NSString *pushDownnum =[alert pushDownnum];
+      
+      [self openBookByURL:[self saxReader:pushDownnum]];
     }
-    
-    else if(alertView.tag == ALERT_PUSH_DOWNLOAD){
-        
-        if (buttonIndex == 1) {
-            //下载推送过来的手册
-        }else{
-            paramPushData =nil;
-        }
-    }
-
+  }
+  
 }
 
 
 - (void)ShowNetWorkWarn{
-    
-    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"提示" 
+  
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"提示"
                                                    message:@"当前属于3G网络，是否要继续下载?" 
                                                   delegate:self 
                                          cancelButtonTitle:@"取消" 
@@ -825,20 +830,30 @@
     [alert show];
 }
 
+- (void)setDownloadTemp:(Book *)book index:(NSUInteger)index{
+  
+  if (!self.downloadTempDic) {
+    self.downloadTempDic =[[NSMutableDictionary alloc] initWithCapacity:2];
+  }
+  
+  [self.downloadTempDic setObject:book forKey:@"book"];
+  [self.downloadTempDic setObject:[NSNumber numberWithInt:index] forKey:@"index"];
+}
 
-//检查网络类型 开始下载
-- (void)checkNetWorkToDownload{
+//检查网络类型 开始下载                         手册cell.index
+- (void)checkNetWorkToDownload:(Book *)book index:(NSUInteger)index{
+  [self setDownloadTemp:book index:index];
+  
+  //判断当前网络类型
+  if ([NetWorkCheck checkIs3G]) {
+    [self ShowNetWorkWarn];
     
-    //判断当前网络类型
-    if ([NetWorkCheck checkIs3G]) {
-        
-        [self ShowNetWorkWarn];
-
-    }else{
-        [self performSelector:@selector(downloadBook:) withObject:_paramBookDic afterDelay:0.5];
-    }
-
+  }else{
     
+    [self startDownloadAction];
+  }
+  
+  
 }
 
 
@@ -857,16 +872,6 @@
     
     [self setEdit:NO];
 }
-
-- (void)setParamBookDic:(NSDictionary *)paramBookDic{
-    if (_paramBookDic) {
-        _paramBookDic =nil;
-    }
-    _paramBookDic =paramBookDic;
-}
-
-
-
 
 //更新手册
 - (void)updateBookCell:(Book *)book atIndex:(NSUInteger)index{
@@ -928,7 +933,7 @@
     /**
      url:wsydlite://www.wsyd.com?downloadnum=%@&su=&st=&hash=
      */
-    
+
     NSUInteger p1 =[urlString rangeOfString:@"?downloadnum="].location;
     NSUInteger p2 =[urlString rangeOfString:@"&su="].location;
     NSUInteger p3 =[urlString rangeOfString:@"&st="].location;
@@ -1059,7 +1064,7 @@
             [self updateBookCell:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
             
             if ([STATUS_downloading isEqualToString:[b status]]) {
-                [self startDownload:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
+                [self checkNetWorkToDownload:b index:[self.gridView getIndexByDownnum:b.downnum]];
             }
         }
         

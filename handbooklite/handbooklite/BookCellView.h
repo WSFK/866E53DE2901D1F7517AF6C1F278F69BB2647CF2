@@ -12,28 +12,30 @@
 #import "ASINetworkQueue.h"
 #import "BookShelfViewController.h"
 
+#define NOTIFICATION_OF_PUSH_MSG_TO_SHOW @"notification_of_push_msg_to_show"
+
 @interface BookCellView : MMGridViewCell{
-    
-    UILabel *_title;
-    UIView *_titleLabelBackgroundView;
-    UIProgressView *_progressView;
-    UIImageView *_backgroundView;
-    UIImageView *_bookIconView;
-    UIButton *_deleteBtn;
-    UIImageView *_suspendView;
-    UILabel *_lbdling;
-    
-    UIButton *_pushBtn;
-    
-    UIImageView *_iconNewImgView;
-    
-    NSString *downnum;
-    
-    BOOL isCancel;
-    
-    
-    ASINetworkQueue *_networkQueue;
-    BookShelfViewController *_bookTarget;
+  
+  UILabel *_title;
+  UIView *_titleLabelBackgroundView;
+  UIProgressView *_progressView;
+  UIImageView *_backgroundView;
+  UIImageView *_bookIconView;
+  UIButton *_deleteBtn;
+  UIImageView *_suspendView;
+  UILabel *_lbdling;
+  
+  UIButton *_pushBtn;
+  
+  UIImageView *_iconNewImgView;
+  
+  NSString *downnum;
+  
+  BOOL isCancel;
+  
+  
+  ASINetworkQueue *_networkQueue;
+  BookShelfViewController *_bookTarget;
 }
 @property (nonatomic ,strong) UILabel *title;
 @property (nonatomic ,strong) UIView *titleLabelBackgroundView;
@@ -75,6 +77,6 @@
 
 - (IBAction)clickDelete:(id)sender;
 
-- (void)downloadBookDic:(NSDictionary *)bookDic target:(BookShelfViewController *)target;
+- (void)showPushNumber:(NSUInteger)number;
 
 @end

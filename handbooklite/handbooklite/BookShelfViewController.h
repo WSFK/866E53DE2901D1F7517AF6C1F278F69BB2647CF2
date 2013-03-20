@@ -19,7 +19,7 @@
 #import "CostomAlertView.h"
 #import "Book.h"
 #import "VerifyHandle.h"
-
+#import "TwoCapture.h"
 
 @interface BookShelfViewController : UIViewController
 <ASIHTTPRequestDelegate,
@@ -70,9 +70,8 @@ UIAlertViewDelegate,VerifyHandleDelegate>
     
     CostomAlertView *promptAlert;
     
-    NSDictionary *_paramBookDic;
-    
-    NSDictionary *paramPushData;//推送过来的数据  全局变量
+    NSMutableDictionary *_downloadTempDic;;
+
     
     VerifyHandle *verifyHandle;
     
@@ -110,7 +109,7 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 
 @property (nonatomic, strong) ContactUsViewController *contactUsView;
 
-@property (nonatomic, strong) NSDictionary *paramBookDic;
+@property (nonatomic, strong) NSMutableDictionary *downloadTempDic;
 
 @property (nonatomic, strong) VerifyHandle *verifyHandle;
 
@@ -121,12 +120,6 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 - (IBAction)toContactUsViewSelector:(id)sender;
 
 - (IBAction)clickEditSelector:(id)sender;
-
-<<<<<<< HEAD
-//下载列表
-- (IBAction)clickDownloadListSelector:(id)sender;
-=======
->>>>>>> 提交最新代码2013-03-20
 
 //重构二维码
 - (NSString *)saxReader:(NSString *)str;

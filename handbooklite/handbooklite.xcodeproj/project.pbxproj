@@ -32,6 +32,18 @@
 		1523B26816EF1E4B00A55C3A /* SinaweiboShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B26316EF1E4B00A55C3A /* SinaweiboShare.m */; };
 		1523B26916EF1E4B00A55C3A /* SinaweiboShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 1523B26316EF1E4B00A55C3A /* SinaweiboShare.m */; };
 		1523B26B16EF26D500A55C3A /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1523B26A16EF26D500A55C3A /* MessageUI.framework */; };
+		1569427B16F9BADE007E30F0 /* CaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1569427416F9BADE007E30F0 /* CaptureViewController.mm */; };
+		1569427C16F9BADE007E30F0 /* CaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1569427416F9BADE007E30F0 /* CaptureViewController.mm */; };
+		1569427D16F9BADE007E30F0 /* CaptureViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1569427516F9BADE007E30F0 /* CaptureViewController.xib */; };
+		1569427E16F9BADE007E30F0 /* CaptureViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1569427516F9BADE007E30F0 /* CaptureViewController.xib */; };
+		1569427F16F9BADE007E30F0 /* TwoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569427816F9BADE007E30F0 /* TwoCapture.m */; };
+		1569428016F9BADE007E30F0 /* TwoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569427816F9BADE007E30F0 /* TwoCapture.m */; };
+		1569428116F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569427A16F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m */; };
+		1569428216F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569427A16F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m */; };
+		1569428A16F9C54E007E30F0 /* PushMsg.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569428916F9C54E007E30F0 /* PushMsg.m */; };
+		1569428B16F9C54E007E30F0 /* PushMsg.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569428916F9C54E007E30F0 /* PushMsg.m */; };
+		1569428F16F9C577007E30F0 /* PushMsgAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569428E16F9C577007E30F0 /* PushMsgAlert.m */; };
+		1569429016F9C577007E30F0 /* PushMsgAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 1569428E16F9C577007E30F0 /* PushMsgAlert.m */; };
 		156B192516F057BD00FC218A /* SinaWeibo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 156B192416F057BD00FC218A /* SinaWeibo.bundle */; };
 		156B192616F057BD00FC218A /* SinaWeibo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 156B192416F057BD00FC218A /* SinaWeibo.bundle */; };
 		E20611831622705C00FA7720 /* DownloadAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E20611821622705C00FA7720 /* DownloadAlertView.m */; };
@@ -254,6 +266,18 @@
 		1523B26216EF1E4B00A55C3A /* SinaweiboShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SinaweiboShare.h; sourceTree = "<group>"; };
 		1523B26316EF1E4B00A55C3A /* SinaweiboShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SinaweiboShare.m; sourceTree = "<group>"; };
 		1523B26A16EF26D500A55C3A /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		1569427316F9BADE007E30F0 /* CaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CaptureViewController.h; path = ../CaptureViewController.h; sourceTree = "<group>"; };
+		1569427416F9BADE007E30F0 /* CaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CaptureViewController.mm; path = ../CaptureViewController.mm; sourceTree = "<group>"; };
+		1569427516F9BADE007E30F0 /* CaptureViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CaptureViewController.xib; path = ../CaptureViewController.xib; sourceTree = "<group>"; };
+		1569427616F9BADE007E30F0 /* CaptureViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CaptureViewControllerDelegate.h; path = ../CaptureViewControllerDelegate.h; sourceTree = "<group>"; };
+		1569427716F9BADE007E30F0 /* TwoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TwoCapture.h; path = ../TwoCapture.h; sourceTree = "<group>"; };
+		1569427816F9BADE007E30F0 /* TwoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TwoCapture.m; path = ../TwoCapture.m; sourceTree = "<group>"; };
+		1569427916F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UINavigationController+Rotation_IOS6.h"; path = "../UINavigationController+Rotation_IOS6.h"; sourceTree = "<group>"; };
+		1569427A16F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UINavigationController+Rotation_IOS6.m"; path = "../UINavigationController+Rotation_IOS6.m"; sourceTree = "<group>"; };
+		1569428816F9C54E007E30F0 /* PushMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushMsg.h; sourceTree = "<group>"; };
+		1569428916F9C54E007E30F0 /* PushMsg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushMsg.m; sourceTree = "<group>"; };
+		1569428D16F9C577007E30F0 /* PushMsgAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushMsgAlert.h; sourceTree = "<group>"; };
+		1569428E16F9C577007E30F0 /* PushMsgAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushMsgAlert.m; sourceTree = "<group>"; };
 		156B192016F0537900FC218A /* SendMailDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SendMailDelegate.h; sourceTree = "<group>"; };
 		156B192416F057BD00FC218A /* SinaWeibo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SinaWeibo.bundle; sourceTree = "<group>"; };
 		E20611811622705C00FA7720 /* DownloadAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadAlertView.h; sourceTree = "<group>"; };
@@ -571,6 +595,8 @@
 		E206117D16226FF700FA7720 /* CustomAlert */ = {
 			isa = PBXGroup;
 			children = (
+				1569428D16F9C577007E30F0 /* PushMsgAlert.h */,
+				1569428E16F9C577007E30F0 /* PushMsgAlert.m */,
 				1523B23B16EF0A3300A55C3A /* TowCodeAlertView.h */,
 				1523B23C16EF0A3300A55C3A /* TowCodeAlertView.m */,
 				E2C55788162E9CB80044A7F3 /* ProgressAlertView.h */,
@@ -700,6 +726,9 @@
 		E2274F5E15EDDFF4002F9A10 /* handbook */ = {
 			isa = PBXGroup;
 			children = (
+				1569427316F9BADE007E30F0 /* CaptureViewController.h */,
+				1569427416F9BADE007E30F0 /* CaptureViewController.mm */,
+				1569427616F9BADE007E30F0 /* CaptureViewControllerDelegate.h */,
 				E2BD3193161583D100ACB102 /* TopViewController.h */,
 				E2BD3194161583D100ACB102 /* TopViewController.m */,
 				E216E95115F452730036499C /* BookViewController.h */,
@@ -719,6 +748,7 @@
 		E2274F6415EDE057002F9A10 /* view */ = {
 			isa = PBXGroup;
 			children = (
+				1569427516F9BADE007E30F0 /* CaptureViewController.xib */,
 				E227509615EE13D1002F9A10 /* images */,
 				E2F5BF03169ECB9A00742353 /* DrawViewController.xib */,
 				E2BB1034160EE6CC0094D3F1 /* ContactUsViewController.xib */,
@@ -731,6 +761,10 @@
 		E2274F6515EDE209002F9A10 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				1569427916F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.h */,
+				1569427A16F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m */,
+				1569427716F9BADE007E30F0 /* TwoCapture.h */,
+				1569427816F9BADE007E30F0 /* TwoCapture.m */,
 				E2D6AC6916EED12000012C5E /* UserInfo.h */,
 				E2D6AC6A16EED12000012C5E /* UserInfo.m */,
 				E2D6AC6B16EED12000012C5E /* UUID.h */,
@@ -962,6 +996,8 @@
 		E28341721675C5B9000918B4 /* entity */ = {
 			isa = PBXGroup;
 			children = (
+				1569428816F9C54E007E30F0 /* PushMsg.h */,
+				1569428916F9C54E007E30F0 /* PushMsg.m */,
 				E28341731675C5EC000918B4 /* Book.h */,
 				E28341741675C5EC000918B4 /* Book.m */,
 			);
@@ -1184,6 +1220,7 @@
 				E2CE0DA316F95E5F0036BE8F /* code_error@2x.png in Resources */,
 				E2CE0DA416F95E5F0036BE8F /* default_icon.png in Resources */,
 				E2CE0DA516F95E5F0036BE8F /* default_icon@2x.png in Resources */,
+				1569427D16F9BADE007E30F0 /* CaptureViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1193,6 +1230,7 @@
 			files = (
 				E2274F4C15EDBEC5002F9A10 /* InfoPlist.strings in Resources */,
 				156B192616F057BD00FC218A /* SinaWeibo.bundle in Resources */,
+				1569427E16F9BADE007E30F0 /* CaptureViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1290,6 +1328,11 @@
 				1523B26616EF1E4B00A55C3A /* ShareAlertView.m in Sources */,
 				1523B26816EF1E4B00A55C3A /* SinaweiboShare.m in Sources */,
 				E2D2405D16F2F6A900DC0CE7 /* VerifyHandle.m in Sources */,
+				1569427B16F9BADE007E30F0 /* CaptureViewController.mm in Sources */,
+				1569427F16F9BADE007E30F0 /* TwoCapture.m in Sources */,
+				1569428116F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m in Sources */,
+				1569428A16F9C54E007E30F0 /* PushMsg.m in Sources */,
+				1569428F16F9C577007E30F0 /* PushMsgAlert.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1305,6 +1348,11 @@
 				1523B26516EF1E4B00A55C3A /* ShareActionSheet.m in Sources */,
 				1523B26716EF1E4B00A55C3A /* ShareAlertView.m in Sources */,
 				1523B26916EF1E4B00A55C3A /* SinaweiboShare.m in Sources */,
+				1569427C16F9BADE007E30F0 /* CaptureViewController.mm in Sources */,
+				1569428016F9BADE007E30F0 /* TwoCapture.m in Sources */,
+				1569428216F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m in Sources */,
+				1569428B16F9C54E007E30F0 /* PushMsg.m in Sources */,
+				1569429016F9C577007E30F0 /* PushMsgAlert.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

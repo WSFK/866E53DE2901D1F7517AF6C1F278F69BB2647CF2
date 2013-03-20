@@ -8,8 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "Book.h"
+#import "PushMsg.h"
 
 @interface DBUtils : NSObject
+
+//--------------------------手册表操作------------------------------------
 
 + (BOOL)insertBook:(Book *)book;
 
@@ -37,5 +40,15 @@
 
 + (BOOL)updateOpenStatus:(NSString *)status downnum:(NSString *)downnum;
 
+
+
+//---------------------------推送信息表操作---------------------------------
++ (BOOL)insertPushMsg:(PushMsg *)pushMsg;
+
++ (NSMutableArray *)queryPushMsgByDownnum:(NSString *)downnum;
+
++ (BOOL)deletePushMsgByDownnum:(NSString *)downnum;
+
++ (NSUInteger)queryCountOfPushMsgByDownnum:(NSString *)downnum;
 
 @end
