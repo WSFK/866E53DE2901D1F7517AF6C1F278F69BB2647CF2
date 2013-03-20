@@ -20,8 +20,16 @@
     UIImageView *_backgroundView;
     UIImageView *_bookIconView;
     UIButton *_deleteBtn;
+    UIImageView *_suspendView;
+    UILabel *_lbdling;
     
-    NSInteger bookId;
+    UIButton *_pushBtn;
+    
+    UIImageView *_iconNewImgView;
+    
+    NSString *downnum;
+    
+    BOOL isCancel;
     
     
     ASINetworkQueue *_networkQueue;
@@ -33,22 +41,39 @@
 @property (nonatomic ,strong) UIImageView *backgroundView;
 @property (nonatomic ,strong) UIImageView *bookIconView;
 @property (nonatomic ,strong) UIButton *deleteBtn;
-@property (nonatomic ,assign) NSInteger bookId;
+@property (nonatomic ,strong) UIImageView *suspendView;
+@property (nonatomic ,strong) UILabel *lbdling;
+
+@property (nonatomic ,strong) UIButton *pushBtn;
+@property (nonatomic ,strong) UIImageView *iconNewImgView;
+
+@property (nonatomic ,copy)   NSString *downnum;
 
 @property (nonatomic ,strong) ASINetworkQueue *networkQueue;
 @property (nonatomic ,strong) BookShelfViewController *bookTarget;
 
 - (id)initWithFrame:(CGRect)frame andIndex:(NSUInteger)atIndex;
 
+
+//启动下载
+- (void)startDownload:(NSString *)iconUrlString
+         zipUrlString:(NSString *)zipUrlString
+              saveDir:(NSString *)saveDir
+             bookName:(NSString *)bookName;
+
+- (void)reloadBookIcon:(BookCellView *)cell iconImage:(UIImage *)iconImage;
+
+
+//取消下载
+- (void)cancelDownload;
+
 - (void)startProgress;
 
 - (void)endProgress;
 
-- (void)cancelEditBtn;
+- (void)showDeleteBtn:(BOOL)isEdit;
 
-- (void)startDeleteIndex:(int)indextmp andTarget:(BookShelfViewController *)target;
-
-- (IBAction)endDelete:(id)sender;
+- (IBAction)clickDelete:(id)sender;
 
 - (void)downloadBookDic:(NSDictionary *)bookDic target:(BookShelfViewController *)target;
 

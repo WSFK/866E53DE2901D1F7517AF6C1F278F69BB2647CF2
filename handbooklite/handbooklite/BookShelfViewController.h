@@ -16,29 +16,48 @@
 #import "ZXingWidgetController.h"
 #import "DownloadAlertView.h"
 #import "ContactUsViewController.h"
-#import "ProgressAlertView.h"
-#import "DownloadUtil.h"
 #import "CostomAlertView.h"
-#import "DownloadListViewController.h"
-#import "Temp.h"
+#import "Book.h"
+#import "VerifyHandle.h"
 
-@interface BookShelfViewController : UIViewController<ASIHTTPRequestDelegate,ZXingDelegate,MMGridViewDelegate,MMGridViewDataSource,DownloadAlertViewDelegate,DownloadUtilDelegate,CostomAlertViewDelegate,UIAlertViewDelegate,DownloadListViewDelegate>{
+
+@interface BookShelfViewController : UIViewController
+<ASIHTTPRequestDelegate,
+ZXingDelegate,
+MMGridViewDelegate,
+MMGridViewDataSource,
+DownloadAlertViewDelegate,
+CostomAlertViewDelegate,
+UIAlertViewDelegate,VerifyHandleDelegate>
+
+{
     
     ASINetworkQueue *_networkQueue;
     NSString *_books_path;
     
+    
+    
+    
+    
     NSMutableArray *_books;
+    NSMutableDictionary *cellStatusDic;
     IBOutlet MMGridView *_gridView;
+    
+    
+    
+    
+    
+    
+    
+    
     
     IBOutlet UILabel *_lbTitle;
     IBOutlet UILabel *_lbPhoto;
     IBOutlet UILabel *_lbLxwm;
     IBOutlet UILabel *_lbEdit;
-    IBOutlet UILabel *_lbDownloadList;
     
     IBOutlet UIImageView *leftMenuImgView;
     
-    UIProgressView *_progress;
     
     InterceptorWindow *_myWindow;
     NSString *_cacheBookPath;
@@ -49,29 +68,35 @@
     
     ContactUsViewController *_contactUsView;
     
-    DownloadUtil *downloadUtil;
-    ProgressAlertView *progressAlert;
     CostomAlertView *promptAlert;
     
     NSDictionary *_paramBookDic;
-    Temp *paramTemp;//定义全局变量 在是否立刻下载中用到
     
     NSDictionary *paramPushData;//推送过来的数据  全局变量
     
-    DownloadListViewController *downloadListView;
+    VerifyHandle *verifyHandle;
     
-    ASIFormDataRequest *formDataRequest;
+    BOOL isVerify;
+    
+    
 }
 @property (nonatomic ,strong) ASINetworkQueue *networkQueue;
 @property (nonatomic ,copy) NSString *books_path;
-@property (nonatomic, strong) NSArray *books;
+
+
+
+@property (nonatomic, strong) NSMutableArray *books;
+@property (nonatomic, strong) NSMutableDictionary *cellStatusDic;
 @property (nonatomic, strong) MMGridView *gridView;
+
+
+
+
 
 @property (nonatomic, strong) UILabel *lbTitle;
 @property (nonatomic, strong) UILabel *lbPhoto;
 @property (nonatomic, strong) UILabel *lbLxwm;
 @property (nonatomic, strong) UILabel *lbEdit;
-@property (nonatomic, strong) UILabel *lbDownloadList;
 
 @property (nonatomic, strong) UIImageView *leftMenuImgView;
 
@@ -82,17 +107,14 @@
 @property (nonatomic, strong) NSString *defaultScreeshotsPath;
 
 @property (nonatomic, strong) DownloadAlertView *downloadAlertView;
-@property (nonatomic, strong) WaitAlertView *waitAlertView;
 
 @property (nonatomic, strong) ContactUsViewController *contactUsView;
 
 @property (nonatomic, strong) NSDictionary *paramBookDic;
 
-- (void)toDownloadViewByBookCell:(MMGridViewCell *)bookCell;
+@property (nonatomic, strong) VerifyHandle *verifyHandle;
 
-- (void)toBookViewController:(int)index;
 
-- (void)updateBooks;
 
 - (IBAction)scanClickSelector:(id)sender;
 
@@ -100,13 +122,17 @@
 
 - (IBAction)clickEditSelector:(id)sender;
 
+<<<<<<< HEAD
 //下载列表
 - (IBAction)clickDownloadListSelector:(id)sender;
+=======
+>>>>>>> 提交最新代码2013-03-20
 
 //重构二维码
 - (NSString *)saxReader:(NSString *)str;
 
 //通过URL打开手册
 - (void)openBookByURL:(NSString *)urlString;
+
 
 @end

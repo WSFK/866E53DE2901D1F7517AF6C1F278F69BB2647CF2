@@ -26,8 +26,9 @@
 #define K_DEFAULT_PAGEINDEX         0
 
 
-#import "MMGridView.h"
 
+#import "MMGridView.h"
+#import "BookCellView.h"
 
 @interface MMGridView()
 
@@ -56,16 +57,15 @@
 @synthesize numberOfTatalRows;
 @synthesize layoutStyle;
 @synthesize isReloadData;
-@synthesize bookCells;
+@synthesize bookCellDic;
 
-@synthesize isEdit;
+@synthesize numberOfEmptyCell;//空位的个数
 
 
 - (void)dealloc
 {
     [scrollView release];
-    [self.bookCells removeAllObjects];
-    self.bookCells =nil;
+    [bookCellDic removeAllObjects],[bookCellDic release];
     [super dealloc];
 }
 
@@ -97,7 +97,7 @@
     numberOfColumns = K_DEFAULT_NUMBEROFCOLUMNS;
     currentPageIndex = K_DEFAULT_PAGEINDEX;
     layoutStyle = VerticalLayout;
-    isEdit =NO;
+    edit =NO;
     
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; 
     self.contentMode = UIViewContentModeRedraw;
@@ -120,11 +120,21 @@
         scrollView.showsVerticalScrollIndicator = YES;
         scrollView.alwaysBounceVertical = YES;
     }
-    if (!bookCells) {
-        bookCells =[[NSMutableArray alloc] init];
-    }
+    
+    bookCellDic =[[NSMutableDictionary alloc] init];
+    
     [self addSubview:scrollView];
     [self reloadData];
+}
+
+- (void)setEdit:(BOOL)editable{
+    
+    edit =editable;
+}
+
+- (BOOL)edit{
+    
+    return edit;
 }
 
 
@@ -167,19 +177,19 @@
         
         [self.scrollView setContentSize:contentSize];
         
-        for (UIView *v in self.scrollView.subviews) {
-            [v removeFromSuperview];
-        }
-        [self.bookCells removeAllObjects];
         
-        //书架中是否存在手册的标示
-        BOOL isHasBook =NO;
+        for (UIView *v in self.scrollView.subviews) {
+            
+            [v removeFromSuperview];
+            
+        }
+        [bookCellDic removeAllObjects];
+        
         
         for (NSInteger i = 0; i < [self.dataSource numberOfCellsInGridView:self]; i++) {
+            
             MMGridViewCell *cell = [self.dataSource gridView:self cellAtIndex:i];
-            if ([cell isHas]) {
-                isHasBook =YES;
-            }
+            
             [cell performSelector:@selector(setGridView:) withObject:self];
             [cell performSelector:@selector(setIndex:) withObject:[NSNumber numberWithInt:i]];
             
@@ -204,8 +214,9 @@
             
             cell.frame = CGRectMake(f.origin.x+11, f.origin.y + 26, 170, 170);
             
-            [self.bookCells addObject:cell];
             [self.scrollView addSubview:cell];
+            
+            [bookCellDic setObject:cell forKey:[NSString stringWithFormat:@"%i",i]];
             
             //一行完成后在下面添加一条背景线
             if (i%noOfRows ==0 && i!=0) {
@@ -221,15 +232,185 @@
             }
             
         }
-        if (!isHasBook && [self isEdit]) {
-            [self setIsEdit:NO];
-        }
+        
         isReloadData =NO;
+         
+        
+    }
+    
+}
+
+- (void)updateBookCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index{
+    
+    NSUInteger nu =[self numberOfEmptyCell];
+    
+    NSUInteger noOfCols = self.numberOfRows;
+    
+    CGRect gridBounds = self.scrollView.bounds;
+    
+    CGRect cellBounds = CGRectMake(0, 0,192,236);
+    
+    CGSize contentSize = CGSizeMake(gridBounds.size.width, ([self currentTotalRows]+1) * cellBounds.size.height);
+    
+    [self.scrollView setContentSize:contentSize];
+    
+    CGPoint origin;
+    
+    
+    if (nu >=1) {
+        //替换
+        MMGridViewCell *oldCell =[bookCellDic objectForKey:[NSString stringWithFormat:@"%i",index]];
+        
+        [cell performSelector:@selector(setGridView:) withObject:self];
+        [cell performSelector:@selector(setIndex:) withObject:[NSNumber numberWithInt:index]];
+        
+        [cell setFrame:CGRectMake(oldCell.frame.origin.x, oldCell.frame.origin.y, cell.frame.size.width, cell.frame.size.height)];
+        
+        [oldCell removeFromSuperview];
+        
+        CGRect f = CGRectMake(oldCell.frame.origin.x, oldCell.frame.origin.y, cellBounds.size.width, cellBounds.size.height);
+        
+        cell.frame = CGRectMake(f.origin.x, f.origin.y, 170, 170);
+        
+        [self.scrollView addSubview:cell];
+        
+        [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.origin.x, (cell.frame.origin.y - 20)) animated:YES];
+        
+        [bookCellDic setObject:cell forKey:[NSString stringWithFormat:@"%i",index]];
+        
+        oldCell =nil;
+        
+        if (nu ==1) {
+            
+            //新增空位
+            
+            int count =[bookCellDic count];
+            
+            for (int i = count; i <(count+5); i++) {
+                
+                MMGridViewCell *emptyCell =[self creatEmptyCell:i];
+                
+                [emptyCell performSelector:@selector(setGridView:) withObject:self];
+                [emptyCell performSelector:@selector(setIndex:) withObject:[NSNumber numberWithInt:i]];
+                
+                
+                origin = CGPointMake((i % noOfCols) * cellBounds.size.width,
+                                     (ceil( i / noOfCols)) * cellBounds.size.height);
+                
+                CGRect f = CGRectMake(origin.x, origin.y, cellBounds.size.width, cellBounds.size.height);
+                
+                emptyCell.frame = CGRectMake(f.origin.x+11, f.origin.y + 26, 170, 170);
+                
+                [self.scrollView addSubview:emptyCell];
+                
+                [bookCellDic setObject:emptyCell forKey:[NSString stringWithFormat:@"%i",i]];
+                
+            }
+            
+            //画线
+            int y =origin.y+ 236;
+            
+            UIView *line =[[[UIView alloc] initWithFrame:CGRectMake(0, y, gridBounds.size.width, 1)]
+                           autorelease];
+            [line setBackgroundColor:[UIColor grayColor]];
+            [line setAlpha:0.6];
+            [self.scrollView addSubview:line];
+        }
+        
+    }
+    
+}
+
+- (void)scrollToCellAtIndex:(NSUInteger)index{
+    
+    MMGridViewCell *cell =[bookCellDic objectForKey:[NSString stringWithFormat:@"%i",index]];
+    
+    [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.origin.x, (cell.frame.origin.y - 20)) animated:YES];
+}
+
+- (NSUInteger)currentTotalRows{
+    
+    NSUInteger numberofCells = [self.bookCellDic count];
+    if (numberofCells % numberOfColumns == 0) {
+        return numberofCells / numberOfColumns;
+    } else {
+        return numberofCells / numberOfColumns + 1;
     }
 }
 
-- (MMGridViewCell *)gridViewCellAtIndex:(int)index{
-    return [self.bookCells objectAtIndex:index];
+- (MMGridViewCell *)creatEmptyCell:(NSUInteger)index{
+    
+    BookCellView *emptyCell = [[BookCellView alloc] initWithFrame:CGRectNull andIndex:index];
+    
+    [emptyCell setIsClick:YES];
+    [emptyCell.title setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [emptyCell.title setTextColor:[UIColor whiteColor]];
+    [emptyCell.title setTextAlignment:UITextAlignmentCenter];
+    emptyCell.title.text = [NSString stringWithFormat:@"点击获取"];
+    
+    emptyCell.backgroundView.image = [UIImage imageNamed:@"kw.png"];
+    
+    [emptyCell.backgroundView setBackgroundColor:[UIColor clearColor]];
+    
+    [emptyCell.backgroundView setContentMode:UIViewContentModeCenter];
+    
+    [emptyCell setType:TYPE_CELL_EMPTY];
+    
+    return emptyCell;
+}
+
+- (NSUInteger)numberOfEmptyCell{
+    
+    NSUInteger count =0;
+    
+    for (int i=0; i<[bookCellDic count]; i++) {
+        
+        MMGridViewCell *cell =[bookCellDic objectForKey:[NSString stringWithFormat:@"%i",i]];
+        if ([cell.type isEqualToString:TYPE_CELL_EMPTY]) {
+            count ++;
+        }
+    }
+    return count;
+}
+
+- (NSUInteger)getFirstEmptyCellIndex{
+    
+    for (int i=0; i<[bookCellDic count]; i++) {
+        
+        MMGridViewCell *cell =[bookCellDic objectForKey:[NSString stringWithFormat:@"%i",i]];
+        if ([cell.type isEqualToString:TYPE_CELL_EMPTY]) {
+            return cell.index;
+        }
+    }
+    return ([bookCellDic count]-1);
+}
+
+- (NSUInteger)getIndexByDownnum:(NSString *)downnum{
+    
+    for (id key in bookCellDic) {
+        
+        BookCellView *cell =(BookCellView *)[bookCellDic objectForKey:key];
+        if ([cell.downnum isEqualToString:downnum]) {
+            
+            NSUInteger index =[cell index];
+            return index;
+        }
+    }
+    return [self getFirstEmptyCellIndex];
+}
+
+- (BOOL)isHasBookCell{
+    
+    for (id key in bookCellDic) {
+        
+        BookCellView *cell =(BookCellView *)[bookCellDic objectForKey:key];
+        
+        if ([[cell type] isEqualToString:TYPE_CELL_BOOK]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (void)setDataSource:(id<MMGridViewDataSource>)aDataSource
@@ -307,6 +488,21 @@
 {
     if (delegate && [delegate respondsToSelector:@selector(gridView:didDoubleTapCell:atIndex:)]) {
         [delegate gridView:self didDoubleTapCell:cell atIndex:cell.index];
+    }
+}
+
+- (void)cellWasDelete:(MMGridViewCell *)cell{
+    
+    if (delegate && [delegate respondsToSelector:@selector(gridView:deleteCell:atIndex:)]) {
+        [delegate gridView:self deleteCell:cell atIndex:cell.index];
+    }
+}
+
+- (void)cellWasDownloadFinished:(MMGridViewCell *)cell error:(NSString *)error{
+    
+    if (delegate && [delegate respondsToSelector:@selector(gridView:finishedCell:atIndex:error:)]) {
+        
+        [delegate gridView:self finishedCell:cell atIndex:cell.index error:error];
     }
 }
 

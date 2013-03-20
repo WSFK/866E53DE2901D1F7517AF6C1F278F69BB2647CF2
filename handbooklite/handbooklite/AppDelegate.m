@@ -14,6 +14,7 @@
 #import "DBUtils.h"
 #import "JSONKit.h"
 #import "Book.h"
+#import "NetWorkCheck.h"
 
 
 
@@ -54,6 +55,8 @@
     }else{
         CCLog(@"launchOptions空");
     }
+    
+    
     
     
     //初始化基础数据
@@ -146,6 +149,19 @@
     
 }
 
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url{
+    
+    if ([@"wsydlite" isEqualToString:[url scheme]]) {
+        
+        //添加 或 打开一本手册
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"open_or_add_notification" object:[url absoluteString]];
+        
+        return YES;
+    }
+    return NO;
+}
+
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
@@ -170,6 +186,12 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
+    if ([NetWorkCheck checkReachable]) {
+        //验证下载码有效性
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"verify_downloadnum_notification" object:nil];
+    }
+    
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -190,62 +212,9 @@
         }else {
             CCLog(@"books拷贝失败");
         }
-    }else{
-        //判断是否存在db.sqlite3文件
-        if (![fm fileExistsAtPath:[books_cache_path stringByAppendingPathComponent:@"db.sqlite3"]]) {
-            
-            [fm copyItemAtPath:[books_resource_path stringByAppendingPathComponent:@"db.sqlite3"] toPath:[books_cache_path stringByAppendingPathComponent:@"db.sqlite3"] error:nil];
-            [self copyJsonDataToDb:fm resourcePath:books_resource_path cachePath:books_cache_path];
-            
-        }
     }
 }
 
-//拷贝json数据到数据库中
-- (void)copyJsonDataToDb:(NSFileManager *)fm resourcePath:(NSString *)resourcePath cachePath:(NSString *)cachePath{
-    
-    //判断是否存在 books.json文件
-    if ([fm fileExistsAtPath:[cachePath stringByAppendingPathComponent:@"books.json"]] &&
-        [fm fileExistsAtPath:[cachePath stringByAppendingPathComponent:@"downnum.json"]]) {
-        
-        NSArray *books =[(NSDictionary *)[[NSData dataWithContentsOfFile:
-                                           [cachePath stringByAppendingPathComponent:@"books.json"]] objectFromJSONData] objectForKey:@"books"];
-        NSArray *downnums =[[[NSData dataWithContentsOfFile:
-                            [cachePath stringByAppendingPathComponent:@"downnum.json"]]
-                             objectFromJSONData] objectForKey:@"downnums"];
-        
-        for (NSString *downnum in downnums) {
-            NSDictionary *bookDic =[self bookByDownNum:downnum fromBooks:books];
-            Book *book =[[Book alloc] init];
-            [book setName:[bookDic objectForKey:@"name"]];
-            [book setDir:[bookDic objectForKey:@"dir"]];
-            [book setDownnum:downnum];
-            [book setBookId:@"null"];
-            [book setIcon:[bookDic objectForKey:@"icon"]];
-            [book setZip:[bookDic objectForKey:@"zip"]];
-            [DBUtils insertBook:book];
-            
-        }
-        //删除books.json 和downnum.json文件
-        [fm removeItemAtPath:[cachePath stringByAppendingPathComponent:@"books.json"] error:nil];
-        [fm removeItemAtPath:[cachePath stringByAppendingPathComponent:@"downnum.json"] error:nil];
-    }
-    
-    
-}
-
-- (NSDictionary *)bookByDownNum:(NSString *)downnum fromBooks:(NSArray *)books{
-    
-    for (NSDictionary *book in books) {
-        /**
-         ["123":{"icon":"icon.jpg","name","时尚家居","dir":"123"}]
-         */
-        if ([book objectForKey:downnum] !=nil) {
-            return [book objectForKey:downnum];
-        }
-    }
-    return nil;
-}
 
 - (void)showWaitting{
     

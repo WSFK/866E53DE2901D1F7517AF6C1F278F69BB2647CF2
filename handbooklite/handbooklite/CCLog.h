@@ -7,7 +7,7 @@
 //
 
 #ifdef DEBUG
-#define CCLog(format, ...)  //NSLog(format, ## __VA_ARGS__)
+#define CCLog(format, ...)  NSLog(format, ## __VA_ARGS__)
 #else
 #define CCLog(format, ...)
 #endif

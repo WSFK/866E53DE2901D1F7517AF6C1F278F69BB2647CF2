@@ -14,10 +14,9 @@
 #import "NSString_NSString.h"
 #import "NetWorkCheck.h"
 #import "DBUtils.h"
-#import "Book.h"
 #import "HttpHeader.h"
 #import "TokenUtil.h"
-#import "UserInfo.h"
+#import "PublicImport.h"
 
 @interface BookShelfViewController ()
 
@@ -27,16 +26,21 @@
 
 @synthesize networkQueue =_networkQueue;
 @synthesize books_path =_books_path;
-@synthesize progress =_progress;
+
+
 
 @synthesize books =_books;
+@synthesize cellStatusDic;
 @synthesize gridView =_gridView;
+
+
+
+
 
 @synthesize lbTitle =_lbTitle;
 @synthesize lbPhoto =_lbPhoto;
 @synthesize lbLxwm =_lbLxwm;
 @synthesize lbEdit =_lbEdit;
-@synthesize lbDownloadList =_lbDownloadList;
 
 @synthesize leftMenuImgView;
 
@@ -51,6 +55,8 @@
 
 @synthesize paramBookDic =_paramBookDic;
 
+@synthesize verifyHandle;
+
 #define BOOK_CELL_NUMBER 5
 #define BOOKS_DIRECTOR @"books"
 #define SCREENSHOT_DIRECTOR @"wsyd-screenshots"
@@ -59,7 +65,19 @@
 #define ALERT_3G_TAG 1002
 #define ALERT_PUSH_DOWNLOAD 1004
 
-#define REQUEST_TYPE_DOWNNUM_CHECK @"downnum_check"
+
+
+
+#define STATUS_DIC_KEY          @"status"
+#define OPEN_STATUS_DIC_KEY     @"openstatus"
+#define PUSH_STATUS_DIC_KEY     @"pushstatus"
+#define PUSH_NUMBER_DIC_KEY     @"pushnumber"
+#define PUSH_MESSAGE_DIC_KEY    @"pushmessage"
+
+
+#define CELL_EMPTY_DIC_KEY      @"celltype"
+#define CELL_EMPTY_YES          @"yes"
+#define CELL_EMPTY_NO           @"no"
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -67,7 +85,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title =@"免费版";
     }
     return self;
 }
@@ -75,6 +92,7 @@
 - (void)viewDidLoad
 {
  
+    [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg.png"]]];
     [self.lbTitle setFont:[UIFont fontWithName:@"Microsoft YaHei" size:16]];
     [self.lbTitle setTextAlignment:UITextAlignmentRight];
     [self.lbTitle setTextColor:[UIColor whiteColor]];
@@ -95,10 +113,6 @@
     [self.lbEdit setTextAlignment:UITextAlignmentCenter];
     [self.lbEdit setText:@"编辑"];
     
-    [self.lbDownloadList setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
-    [self.lbDownloadList setTextColor:[UIColor whiteColor]];
-    [self.lbDownloadList setTextAlignment:UITextAlignmentCenter];
-    [self.lbDownloadList setText:@"下载列表"];
     
     self.books_path =[CACHE_PATH stringByAppendingPathComponent:BOOKS_DIRECTOR];
     self.bundleBookPath =[RESOURCE_PATH stringByAppendingPathComponent:BOOKS_DIRECTOR];
@@ -114,21 +128,37 @@
         }
     }
     
-    [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg.png"]]];
-    [self updateBooks];
-    [self setUpMMGridView];
     
+    //注册检查列表通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didBookListVerify:)
+                                                 name:@"verify_downloadnum_notification"
+                                               object:nil];
+    
+    //注册打开手册通知
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(openOrAddBook:)
+                                                 name:@"open_or_add_notification"
+                                               object:nil];
+    
+    
+    //初始化联系我们
     _contactUsView =[[ContactUsViewController alloc]
-                                             initWithNibName:@"ContactUsViewController"
-                                             bundle:nil];
+                     initWithNibName:@"ContactUsViewController"
+                     bundle:nil];
     [_contactUsView setViewHidden:YES withAnimation:NO];
     [self.view addSubview:_contactUsView.view];
     
-    //下载列表
-    downloadListView = [[DownloadListViewController alloc] init];
-    [downloadListView setDelegate:self];
-    [self.view insertSubview:downloadListView.view belowSubview:leftMenuImgView];
-    [downloadListView setViewHidden:YES withAnimation:NO];
+    
+    
+    
+    
+    //查询手册列表
+    [self queryBookList];
+    //初始化书架
+    [self setUpMMGridView];
+    
+    
     
     
     NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
@@ -138,18 +168,68 @@
         [self performSelector:@selector(showPromptAlert) withObject:nil afterDelay:0.5];
     }
     
-    //添加左右滑动事件
-    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipeToLeft)];
-    swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
-    [self.view addGestureRecognizer:swipeLeft];
-    
-    UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipeToRight)];
-    swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
-    [self.view addGestureRecognizer:swipeRight];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }
+
+
+//查询手册列表
+- (void)queryBookList{
+    
+    if ([_books count] >0) {
+        [_books removeAllObjects];
+    }
+    _books =[DBUtils queryAllBooks];
+    
+    NSUInteger numberOfCell =([_books count]%BOOK_CELL_NUMBER)>0?
+    [_books count]+(BOOK_CELL_NUMBER-([_books count]%BOOK_CELL_NUMBER)):[_books count]+BOOK_CELL_NUMBER;
+    
+    if (!cellStatusDic) {
+        cellStatusDic =[[NSMutableDictionary alloc] initWithCapacity:numberOfCell];
+    }
+    [cellStatusDic removeAllObjects];
+    
+    
+    for (int i = 0; i < numberOfCell; i++) {
+        
+        Book *book = nil;
+        
+        if ((i+1) <= [_books count]) {
+            
+            book =[_books objectAtIndex:i];
+        }
+        
+        NSMutableDictionary *statusDic =[[NSMutableDictionary alloc] init];
+        
+        if (book) {
+            
+            [statusDic setObject:[book status] forKey:STATUS_DIC_KEY];
+            [statusDic setObject:[book openstatus] forKey:OPEN_STATUS_DIC_KEY];
+            [statusDic setObject:STATUS_PUSH_NO forKey:PUSH_STATUS_DIC_KEY];
+            [statusDic setObject:@"0" forKey:PUSH_NUMBER_DIC_KEY];
+            [statusDic setObject:@"" forKey:PUSH_MESSAGE_DIC_KEY];
+            [statusDic setObject:CELL_EMPTY_NO forKey:CELL_EMPTY_DIC_KEY];
+            
+        }else{
+            
+             [statusDic setObject:CELL_EMPTY_YES forKey:CELL_EMPTY_DIC_KEY];
+        }       
+        
+        [cellStatusDic setObject:statusDic forKey:[book downnum]==nil?[NSString stringWithFormat:@"empty%i",i]:[book downnum]];
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
 
 //接受推送数据的提示
 - (void)showPushMessage:(NSNotification *)notifi{
@@ -179,19 +259,11 @@
     [promptAlert show];
 }
 
-- (void)didSwipeToLeft{
-    [_contactUsView setViewHidden:NO withAnimation:YES];
-}
-
-- (void)didSwipeToRight{
-    [_contactUsView setViewHidden:YES withAnimation:YES];
-}
-
 #pragma -mark CostomAlertDelegate
 - (void)didComfirm{
     
-    
-    [self requestDataByDownnum:HELP_DOWNNUM];
+    //添加帮助手册
+    [self openBookByURL:[self saxReader:HELP_DOWNNUM]];
     
     NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
     [defaults setObject:@"YES" forKey:@"prompt"];
@@ -224,12 +296,14 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-  NSLog(@"===> BookShelf unload!");
+  CCLog(@"===> BookShelf unload!");
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
     self.networkQueue =nil;
     self.books_path =nil;
     self.books =nil;
+    
+    
     self.bundleBookPath =nil;
     self.cacheBookPath =nil;
     self.defaultScreeshotsPath =nil;
@@ -239,14 +313,12 @@
     self.lbPhoto =nil;
     self.lbLxwm =nil;
     self.lbEdit =nil;
-    self.lbDownloadList =nil;
     self.leftMenuImgView =nil;
     
     self.progress =nil;
     
     self.paramBookDic =nil;
     
-    downloadListView =nil;
 }
 
 - (void)didReceiveMemoryWarning{
@@ -260,7 +332,18 @@
 	return [self orientationByString:ORIENTATION InterfaceOrientation:interfaceOrientation];
 }
 
-//列表
+
+
+
+
+
+
+
+
+
+
+
+//列表显示的个数  包括空位
 #pragma - MMGridViewDataSource
 
 - (NSInteger)numberOfCellsInGridView:(MMGridView *)gridView
@@ -269,80 +352,154 @@
     [_books count]+(BOOK_CELL_NUMBER-([_books count]%BOOK_CELL_NUMBER)):[_books count]+BOOK_CELL_NUMBER;
 }
 
+
+
+
+
+//初始化书架上面的手册
 #pragma - MMGridViewDataSource
 - (MMGridViewCell *)gridView:(MMGridView *)gridView cellAtIndex:(NSUInteger)index
 {
+    
+    
     BookCellView *cell = [[BookCellView alloc] initWithFrame:CGRectNull andIndex:index];
+    
     [cell setIsClick:YES];
     [cell.title setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
     [cell.title setTextColor:[UIColor whiteColor]];
     [cell.title setTextAlignment:UITextAlignmentCenter];
     
+    Book *book =nil;
     
-    if ((index+1) >[_books count]) {
-        cell.title.text = [NSString stringWithFormat:@"点击获取"];
-        cell.backgroundView.image = [UIImage imageNamed:@"kw.png"];
-        [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
-        [cell.backgroundView setContentMode:UIViewContentModeCenter];
-    }else{
-        Book *book =[_books objectAtIndex:index];
-        NSString *iconPath =[self.books_path stringByAppendingFormat:@"/icons/%@",[book getIconName]];
-        [cell setBookId:[book ID]];
-        CCLog(@"bookId:%i",[book ID]);
-        CCLog(@"iconPath:%@",iconPath);
+    if ((index + 1) <= [_books count]){
         
-        UIImage *iconimg = [UIImage imageWithContentsOfFile:iconPath];
-        double ih = iconimg.size.height;
-        double iw = iconimg.size.width;
-        
-        double ifw = cell.bookIconView.frame.size.width;
-        double ifh = cell.bookIconView.frame.size.height;
-        
-        if (iw > ih) {
-            double nifh = ifh * ih / iw;
-            double difh = ifh - nifh;
-            
-            CGRect newIconFrame = cell.bookIconView.frame;
-            cell.bookIconView.frame = CGRectMake(newIconFrame.origin.x , newIconFrame.origin.y + difh , newIconFrame.size.width, newIconFrame.size.height - difh);
-            
-            CGRect newBackGroudFrame = cell.backgroundView.frame;
-            cell.backgroundView.frame = CGRectMake(newBackGroudFrame.origin.x  , newBackGroudFrame.origin.y + difh, newBackGroudFrame.size.width, newBackGroudFrame.size.height - difh);
-            
-            CGRect delFrame =CGRectMake(newIconFrame.origin.x+newIconFrame.size.width-21,
-                                        newIconFrame.origin.y + difh-21,
-                                        42, 42);
-            [cell.deleteBtn setFrame:delFrame];
-        }
-        
-        if (iw < ih) {
-            double nifw = ifw * iw / ih;
-            double difw = ifw - nifw;
-            
-            CGRect newIconFrame = cell.bookIconView.frame;
-            cell.bookIconView.frame = CGRectMake(newIconFrame.origin.x + difw / 2 , newIconFrame.origin.y , newIconFrame.size.width- difw, newIconFrame.size.height);
-            
-            CGRect newBackGroudFrame = cell.backgroundView.frame;
-            cell.backgroundView.frame = CGRectMake(newBackGroudFrame.origin.x + difw / 2 , newBackGroudFrame.origin.y, newBackGroudFrame.size.width - difw, newBackGroudFrame.size.height);
-            
-            CGRect delFrame =CGRectMake(newIconFrame.origin.x + difw / 2 + newIconFrame.size.width- difw -21,
-                                        newIconFrame.origin.y-21,
-                                        42, 42);
-            [cell.deleteBtn setFrame:delFrame];
-        }
-        
-        [cell setIsHas:YES];
-        NSString *bookTitle =[book name];
-        cell.bookIconView.image = [UIImage imageWithContentsOfFile:iconPath];
-        [cell.title setText:bookTitle];
-        
-        //编辑
-        if ([_gridView isEdit]) {
-            [cell startDeleteIndex:index andTarget:self];
-        }
+        book =[_books objectAtIndex:index];
     }
+    
+    NSMutableDictionary *statusDic =[cellStatusDic objectForKey:[book downnum] ==nil
+                                     ?[NSString stringWithFormat:@"empty%i",index]
+                                                               :[book downnum]];
+    
+    if ([CELL_EMPTY_YES isEqualToString:[statusDic objectForKey:CELL_EMPTY_DIC_KEY]]) {
+        
+        //cell.title.text = [NSString stringWithFormat:@"点击获取"];
+        
+        cell.backgroundView.image = [UIImage imageNamed:@"kw.png"];
+        
+        [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+        
+        [cell.backgroundView setContentMode:UIViewContentModeCenter];
+        
+        [cell setType:TYPE_CELL_EMPTY];
+        
+        return cell;
+    }
+    
+    cell =[self createBookCell:book withStatusDic:statusDic atIndex:index];
+    
     
     return cell;
 }
+
+
+//创建手册
+- (BookCellView *)createBookCell:(Book *)book withStatusDic:(NSMutableDictionary *)statusDic atIndex:(NSUInteger)index{
+    
+    
+    BookCellView *cell = [[BookCellView alloc] initWithFrame:CGRectNull andIndex:index];
+    
+    [cell setIsClick:YES];
+    [cell.title setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [cell.title setTextColor:[UIColor whiteColor]];
+    [cell.title setTextAlignment:UITextAlignmentCenter];
+    
+    if ([CELL_EMPTY_NO isEqualToString:[statusDic objectForKey:CELL_EMPTY_DIC_KEY]]) {
+        
+        NSString *iconPath =[self.books_path stringByAppendingFormat:@"/icons/%@",[book getIconName]];
+        
+        NSString *name =@"";
+        
+        UIImage *iconImage;
+        NSFileManager *fm =[NSFileManager defaultManager];
+        
+        if ([fm fileExistsAtPath:iconPath]) {
+            
+            iconImage =[UIImage imageWithContentsOfFile:iconPath];
+            name =[book name];
+            [cell setIsHas:YES];
+            
+            
+            if ([OPEN_STATUS_NO isEqualToString:[statusDic objectForKey:OPEN_STATUS_DIC_KEY]]) {
+                
+                [cell.iconNewImgView setHidden:NO];
+            }
+            
+            if ([OPEN_STATUS_YES isEqualToString:[statusDic objectForKey:OPEN_STATUS_DIC_KEY]]) {
+                
+                [cell.iconNewImgView setHidden:YES];
+            }
+            
+            
+            
+        }else if([STATUS_already_enter_code_not_found isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]){
+            
+            iconImage =[UIImage imageNamed:@"code_error.png"];
+            [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+            name =@"手册未找到";
+            
+        }else if([STATUS_already_enter_code_not_share isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]){
+            
+            iconImage =[UIImage imageNamed:@"code_error.png"];
+            [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+            name =@"手册尚未分享";
+            
+        }else if([STATUS_already_enter_code_out_date isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]){
+            
+            iconImage =[UIImage imageNamed:@"code_error.png"];
+            [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+            name =@"手册已过期";
+            
+        }else{
+            
+            iconImage =[UIImage imageNamed:@"default_icon.png"];
+            //iconImage =[UIImage imageNamed:@"landscape_bg.png"];
+            [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+        }
+        
+        if ([STATUS_downloading_exception isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
+            
+            [cell endProgress];
+            [cell.lbdling setHidden:YES];
+            [cell.suspendView setHidden:YES];
+            [cell.iconNewImgView setHidden:YES];
+            
+            iconImage =[UIImage imageNamed:@"code_error.png"];
+            [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+            
+        }
+        
+        
+        [cell reloadBookIcon:cell iconImage:iconImage];
+        
+        cell.title.text =name;
+        
+        [cell setType:TYPE_CELL_BOOK];
+        [cell setDownnum:[book downnum]];
+        
+        
+    }
+    
+    if (![self.gridView isHasBookCell]) {
+        
+        [self.gridView setEdit:NO];
+    }
+    
+    [cell showDeleteBtn:self.gridView.edit];
+    
+    return cell;
+}
+
+
 
 // ----------------------------------------------------------------------------------
 
@@ -350,72 +507,219 @@
 
 - (void)gridView:(MMGridView *)gridView didSelectCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index
 {
-    //[(BookCellView *)cell startProgress];
     
-    //编辑状态不做操作
-    if ([_gridView isEdit]) {
+    [self queryBookList];
+    
+    //编辑状态 或 不可点击 不做操作
+    if ([_gridView edit]) {
         return;
     }
     
-    CCLog(@"----------index:%i",index);
-    //判断当前点击的是否存在手册
-    if ((index+1)>[self.books count] || ![self isHasBook:index]) {
-        CCLog(@"--------当前没有手册 进入下载");
-        [self toDownloadViewByBookCell:cell];
-    }else {
+    if ((index +1) > [self.books count]) {
+        [self toScanView];
+    }else{
+        Book *book =[self.books objectAtIndex:index];
         
-        if ([self isHasBook:index]) {
-            CCLog(@"-------有手册 进入手册观看");
-            [self toBookViewController:index];
+        if ([STATUS_already_download isEqualToString:[book status]] && [self isHasBookLocation:book]) {
+            
+            //更新状态
+            [DBUtils updateOpenStatus:OPEN_STATUS_YES downnum:[book  downnum]];
+            [[(BookCellView *)cell iconNewImgView] setHidden:YES];
+            [self toBookView:book];
+            
+            return;
         }
+        
+        if ([STATUS_downloading_waitting isEqualToString:[book status]] ||
+            [STATUS_downloading_suspend isEqualToString:[book status]] ||
+            [STATUS_downloading_exception isEqualToString:[book status]]) {
+            
+            if (![DBUtils isHasStatusDownloading]) {
+                
+                [self startDownload:book atIndex:index];
+            }
+            return;
+        }
+        
+        if ([STATUS_downloading isEqualToString:[book status]]) {
+            
+            [(BookCellView *)cell cancelDownload];
+            [DBUtils updateBookStatus:STATUS_downloading_suspend downnum:[book downnum]];
+            
+            return;
+        }
+        
+        if ([STATUS_already_enter_code isEqualToString:[book status]] ||
+            [STATUS_already_enter_code_not_found isEqualToString:[book status]] ||
+            [STATUS_already_enter_code_not_share isEqualToString:[book status]] ||
+            [STATUS_already_enter_code_out_date isEqualToString:[book status]] ||
+            [STATUS_already_enter_code_suspend isEqualToString:[book status]])
+        {
+            [self startVerifyHandle];
+            
+        }
+        
+        
     }
+    
     
 }
 
-//判断本地手册是否存在
-- (BOOL)isHasBook:(int)index{
+- (void)startDownload:(Book *)book atIndex:(NSUInteger)index{
+    
+    [DBUtils updateBookStatus:STATUS_downloading downnum:[book downnum]];
+    
+    BookCellView *cell =(BookCellView *)[self.gridView.bookCellDic objectForKey:[NSString stringWithFormat:@"%i",index]];
+    
+    [cell startDownload:[book icon] zipUrlString:[book zip] saveDir:[book dir] bookName:[book name]];
+}
+
+#pragma - MMGridViewDelegate  下载完成
+- (void)gridView:(MMGridView *)gridView finishedCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index error:(NSString *)error{
+    
+    NSString *downnum =[(BookCellView *)cell downnum];
+    
+    if ([@"null" isEqualToString:error]) {
+        //更新数据库状态
+        [DBUtils updateBookStatus:STATUS_already_download downnum:downnum];
+        
+    }
+    
+    if ([@"failed" isEqualToString:error]) {
+        
+        //更新数据库状态
+        [DBUtils updateBookStatus:STATUS_downloading_exception downnum:downnum];
+    }
+    
+    [self queryBookList];
+}
+
+- (void)setEdit:(BOOL)isEdit{
+    
+    
+    if ([DBUtils isHasStatusDownloading] || isVerify) {
+        return;
+    }
+    
+    for (id key in self.gridView.bookCellDic) {
+        
+        
+        BookCellView *cell =(BookCellView *)[self.gridView.bookCellDic objectForKey:key];
+        
+        if ([cell.type isEqualToString:TYPE_CELL_BOOK]) {
+            [cell showDeleteBtn:isEdit];
+            
+            self.gridView.edit =isEdit;
+        }
+       
+    }
+}
+
+
+
+
+- (void)gridView:(MMGridView *)gridView deleteCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index{
+    
+    [self deleteBook:index];
+    
+    //刷新列表
+    [self queryBookList];
+    [self.gridView reloadData];
+}
+
+
+
+
+
+//删除手册方法
+- (void)deleteBook:(NSUInteger)index{
+    
     Book *book =[_books objectAtIndex:index];
     
-    if (book ==nil) {
-        return NO;
+    NSString *bookPath =[CACHE_PATH stringByAppendingFormat:@"/books/%@",[book dir]];
+    
+    NSString *sccreeshotsPath =[self.defaultScreeshotsPath stringByAppendingFormat:@"/%@",[book downnum]];
+    
+    NSString *iconPath =[CACHE_PATH stringByAppendingFormat:@"/books/icons/%@",[book getIconName]];
+    
+    if ([DBUtils deleteBookByDownnum:[book downnum]]) {
+        
+        
+        
+        NSFileManager *fm =[NSFileManager defaultManager];
+        if ([fm fileExistsAtPath:sccreeshotsPath])
+        {
+            //删除缓存图片
+            BOOL result =[fm removeItemAtPath:sccreeshotsPath error:nil];
+            if (!result) {
+                CCLog(@"remove file failed：%@",sccreeshotsPath);
+            }
+            
+        }
+        if([fm fileExistsAtPath:bookPath])
+        {
+            //删除本地手册文件
+            BOOL result =[fm removeItemAtPath:bookPath error:nil];
+            if(!result){
+                CCLog(@"remove file failed：%@",bookPath);
+            }
+        }
+        
+        if ([fm fileExistsAtPath:iconPath]) {
+            //删除手册图标
+            BOOL result =[fm removeItemAtPath:iconPath error:nil];
+            if (!result) {
+                CCLog(@"remove file failed：%@",iconPath);
+            }
+        }
+        
+        
     }
     
-    NSString *bookDocPath = [_cacheBookPath stringByAppendingPathComponent:[book dir]];
-    
-    NSFileManager *fm =[NSFileManager defaultManager];
-    
-    if ([fm fileExistsAtPath:bookDocPath] && 
-        [fm fileExistsAtPath:[bookDocPath stringByAppendingPathComponent:@"book.json"]]) 
-    {
-        return YES;
-    }
-    return NO;
 }
 
-#pragma - MMGridViewDelegate
-- (void)gridView:(MMGridView *)gridView didDoubleTapCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index
-{
-    //双击事件
-}
 
-#pragma - MMGridViewDelegate
-- (void)gridView:(MMGridView *)theGridView changedPageToIndex:(NSUInteger)index
-{
-    CCLog(@"----------changedPageToIndex:%i",index);
-}
+
+
+
+
+
+
+
 
 //初始化MMGridView
 - (void)setUpMMGridView{
-    self.gridView.cellMargin = 20;
-    self.gridView.numberOfRows = BOOK_CELL_NUMBER;
+    
+    self.gridView.cellMargin = 20;//手册之间的填充20像素
+    
+    self.gridView.numberOfRows = BOOK_CELL_NUMBER;//书架一行显示5本手册
+    
     self.gridView.numberOfColumns = 3;
+    
     //self.gridView.layoutStyle = HorizontalLayout; //水平布局
+    
     self.gridView.layoutStyle = VerticalLayout;     //垂直布局
-    //[self.gridView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg.png"]]];
+    
+    
     [self.gridView setBackgroundColor:[UIColor clearColor]];
 }
 
-- (void)toDownloadViewByBookCell:(MMGridViewCell *)bookCell{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//显示拍照 或者 录码 对话框
+- (void)showDownloadAlertView{
     
     _downloadAlertView =[[DownloadAlertView alloc] initWithImage:[UIImage imageNamed:@"alert.png"]];
     [_downloadAlertView setDelegate:self];
@@ -429,79 +733,32 @@
 
 #pragma -mark DownloadAlertViewDelegate
 - (void)goPhotoView{
-    [self scanClickSelector:nil];
+    [self toScanView];
 }
 
 #pragma -mark DownloadAlertViewDelegate
 - (void)commitWithText:(NSString *)text{
     
-    paramTemp =[[Temp alloc] init];
+    [self openBookByURL:[self saxReader:text]];
     
-    [paramTemp setDownnum:text];
-    
-    //提示是否立刻下载
-    [self showImmediatelyDownloadAlert];
 }
 
-//刷新手册列表
-- (void)updateBooks{
-    
-    if (_books.count>0) {
-        [_books removeAllObjects],_books =nil;
-    }
-    //初始化数据
-    _books = [DBUtils queryAllBooks];
-    
-    CCLog(@"----book counts:%i",[_books count]);
-}
-
-//观看
-- (void)toBookViewController:(int)index{
-  HttpHeader *hh = [HttpHeader shareInstance];
-  hh.tapTimes += 1;
-  [iConsole log:[NSString stringWithFormat:@"打开手册次数：%d",hh.tapTimes]];
-  
-    Book *book =[_books objectAtIndex:index];
-    
-    NSString *bookCachePath = [_cacheBookPath stringByAppendingPathComponent:[book dir]];
-    NSString *bookBundlePath = [_bundleBookPath stringByAppendingPathComponent:[book dir]];
-    
-    BookViewController *bookViewController = 
-    [[BookViewController alloc] initWithCachesBookPath:bookCachePath
-                                        bundleBookPath:bookBundlePath
-                                 defaultScreeshotsPath:[_defaultScreeshotsPath
-                                                        stringByAppendingPathComponent:[book dir]]
-                                                target:self
-                                               book:book];
-    [_myWindow setDisableTap:NO];
-    [_myWindow setTarget:[bookViewController scrollView] eventsDelegate:bookViewController];
-    
-    [bookViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-    
-    //不用push  因为push切换界面后 界面的方向旋转总是有问题
-    // Check if iOS4 or 5
-    if ([self respondsToSelector:@selector(presentViewController:animated:completion:)]) {
-        // iOS 5
-        [self presentViewController:bookViewController animated:YES completion:nil];
-    } else {
-        // iOS 4
-        [self presentModalViewController:bookViewController animated:YES];
-    }
-    //[bookViewController setTitle:[bookDic objectForKey:@"name"]];
-    //[self.navigationController pushViewController:bookViewController animated:YES];
-    //由于这两个方法暂时不知道为什么不能执行 现在使用通知的方式执行它们
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"willRotate" object:nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"didRotate" object:nil];
-    
-    
-    
-}
 
 //点击拍照按钮
 - (void)scanClickSelector:(id)sender{
     
-    ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self 
-                                                                                showCancel:YES 
+    //如果当前为编辑状态  取消
+    [self cancelEdit];
+    
+    //改成启动对话框
+    [self showDownloadAlertView];
+    
+}
+
+- (void)toScanView{
+    
+    ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self
+                                                                                showCancel:YES
                                                                                   OneDMode:NO];
     QRCodeReader* qrcodeReader = [[QRCodeReader alloc] init];
     NSSet *readers = [[NSSet alloc ] initWithObjects:qrcodeReader,nil];
@@ -515,6 +772,7 @@
 
 #pragma mark-ZXingDelegate
 - (void)zxingControllerDidCancel:(ZXingWidgetController *)controller{
+    
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -528,90 +786,13 @@
          */
         //解析二维码
         
-        paramTemp =[self tempFromString:result];
-        
-        //提示是否立刻下载
-        [self performSelector:@selector(showImmediatelyDownloadAlert) withObject:nil afterDelay:0.5];
+        [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result] afterDelay:1.0];
         
     }
     [self dismissModalViewControllerAnimated:NO];
 }
 
-- (void)requestDataByDownnum:(NSString *)downnum{
-    
-    CCLog(@"----------downnum:%@",downnum);
-    if (downnum ==nil || [downnum isEmpty]) {
-        [self showMessage:@"该二维码不能下载手册"];
-        return;
-    }
-    
-    if ([DBUtils isExistBookByDownnum:downnum]) {
-        [self showMessage:@"您已经下载过这本手册了"];
-        return;
-    }
-    
-    //请求数据
-    ASIFormDataRequest *request =[ASIFormDataRequest
-                                  requestWithURL:[NSURL URLWithString:DOWNLOAD_URL]];
-    [request setDelegate:self];
-    //不再重用上一个url
-    [request setShouldAttemptPersistentConnection:NO];
-    [request setTimeOutSeconds:10];
-    [request setPostValue:downnum forKey:@"downloadnum"];
-    [request setPostValue:[TokenUtil getLocalToken] forKey:@"token"];
-    [request setUserInfo:[NSDictionary dictionaryWithObject:downnum forKey:@"downnum"]];
-    [request startAsynchronous];
-    [self showWaitting];
-    
-}
 
-#pragma mark -ASIHTTPRequestDelegate
-- (void)requestFailed:(ASIHTTPRequest *)request{
-    [self dismissWaitting];
-    [self showMessage:@"网络故障，请稍后再试！"];
-}
-
-- (void)requestFinished:(ASIHTTPRequest *)request{
-    [self dismissWaitting];
-    
-    if ([request responseStatusCode] ==200) {
-        
-        if ([(NSString *)[[request userInfo] objectForKey:@"type"] isEqualToString:REQUEST_TYPE_DOWNNUM_CHECK]) {
-            //处理下载码验证信息
-            [self handleCheckInfo:request];
-            
-        }
-        
-        NSDictionary *data = [(NSDictionary *)[[request responseData] objectFromJSONData]
-                              objectForKey:@"handbookMsg"];
-       
-        if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
-            
-            NSString *downnum =[[request userInfo] objectForKey:@"downnum"];
-            NSString *httpHeader =[(NSDictionary *)[[request responseData] objectFromJSONData] objectForKey:@"httpImage"];
-            //更新httpHeader
-            [[HttpHeader shareInstance] updateHttpHeader:httpHeader];
-            
-            NSMutableDictionary *book =[[data objectForKey:@"book"] mutableCopy];
-            [book setObject:downnum forKey:@"downnum"];
-            
-            [request clearDelegatesAndCancel];
-            
-            [self setParamBookDic:book];//设置全局变量
-            
-            
-            //通知下载
-            [self performSelector:@selector(checkNetWorkToDownload) withObject:nil afterDelay:0.5];
-            
-        }
-        else {
-            [self showMessage:[data objectForKey:@"error"]];
-        }
-        
-    }else {
-        [self showMessage:[NSString stringWithFormat:@"请求错误:%i",[request responseStatusCode]]];
-    }
-}
 
 #pragma -mark UIAlertViewDelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
@@ -619,42 +800,11 @@
     if (alertView.tag==ALERT_3G_TAG && buttonIndex == 1) {
         [self performSelector:@selector(downloadBook:) withObject:_paramBookDic afterDelay:0.5];
     }
-    else if (alertView.tag == ALERT_DOWNLOAD_TAG)
-    {
-        //提示是否立刻下载操作
-        if (buttonIndex ==0) {
-            
-            /**
-                稍后下载 将Temp信息存入下载列表中
-                判断列表中是否存在downnum 不存在添加
-             */
-            
-            if(![DBUtils isExisttempByDownnum:[paramTemp downnum]]){
-                
-                [paramTemp setSavedate:[NSDate date]];
-                if([DBUtils insertTemp:paramTemp]){
-                    [self showMessage:@"成功保存到下载列表!"];
-                }else{
-                    [self showMessage:@"保存到下载列表失败!"];
-                }
-                
-            }else{
-                [self showMessage:@"下载列表中已存在!"];
-            }
-            
-            
-        }else if(buttonIndex ==1)
-        {
-            //立刻下载
-            [self performSelector:@selector(requestDataByDownnum:) withObject:[paramTemp downnum] afterDelay:0.5];
-        }
-        
-        paramTemp =nil;
-    }else if(alertView.tag == ALERT_PUSH_DOWNLOAD){
+    
+    else if(alertView.tag == ALERT_PUSH_DOWNLOAD){
         
         if (buttonIndex == 1) {
             //下载推送过来的手册
-            [self downloadPushHandbook];
         }else{
             paramPushData =nil;
         }
@@ -662,18 +812,6 @@
 
 }
 
-- (void)downloadPushHandbook{
-    
-    //根据下载码删除已有的手册记录
-    CCLog(@"----------%@",paramPushData);
-    NSString *downnum =[paramPushData objectForKey:@"downnum"];
-    [DBUtils deleteBookByDownnum:downnum];
-    
-    [self requestDataByDownnum:downnum];
-    
-    paramPushData =nil;
-    
-}
 
 - (void)ShowNetWorkWarn{
     
@@ -687,21 +825,6 @@
     [alert show];
 }
 
-- (void)showImmediatelyDownloadAlert{
-    
-    //判断paramTemp是否为空 如果为空则不是该应用的二维码 做出提示
-    if (paramTemp != nil) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示"
-                                                        message:@"是否立刻下载?"
-                                                       delegate:self
-                                              cancelButtonTitle:@"稍后下载"
-                                              otherButtonTitles:@"立刻下载", nil];
-        alert.tag = ALERT_DOWNLOAD_TAG;
-        [alert show];
-    }else{
-        [self showMessage:@"该二维码不属于本应用！"];
-    }
-}
 
 //检查网络类型 开始下载
 - (void)checkNetWorkToDownload{
@@ -718,35 +841,6 @@
     
 }
 
-- (void)downloadBook:(NSDictionary *)book{
-   
-    progressAlert = [[ProgressAlertView alloc] init];
-    downloadUtil = [[DownloadUtil alloc] init];
-    CCLog(@"-------bookDic:%@",book);
-    [downloadUtil startDownloadBookDic:book progressView:[progressAlert showPrg]];
-    [downloadUtil setDelegate:self];
-}
-
-#pragma -mark DownloadUtilDelegate
-- (void)didQueueFinished{
-    [progressAlert dismiss];
-}
-
-- (void)didFailed{
-    
-    Temp *tp =[[Temp alloc] init];
-    [tp setDownnum:[_paramBookDic objectForKey:@"downnum"]];
-    [tp setName:[_paramBookDic objectForKey:@"name"]];
-    [DBUtils insertTemp:tp];
-    
-    [self showMessage:@"下载失败，您可以到下载列表中找到继续下载！"];
-}
-
-- (void)didFinished{
-    [self updateBooks];
-    [self.gridView reloadData];
-    [self showMessage:@"下载成功"];
-}
 
 //联系我们
 - (void)toContactUsViewSelector:(id)sender{
@@ -756,31 +850,12 @@
 //编辑
 - (void)clickEditSelector:(id)sender{
     
-    //是否存在手册的标示
-    BOOL isHasBook =NO;
-    
-    for (BookCellView *cell in [_gridView bookCells]) {
-        //不是空位
-        if ([cell isHas]) {
-            [cell startDeleteIndex:cell.index andTarget:self];
-            isHasBook =YES;
-        }
-    }
-    if (isHasBook) {
-        [_gridView setIsEdit:![_gridView isEdit]];
-    }
+    [self setEdit:!self.gridView.edit];
 }
 //取消编辑状态
 - (void)cancelEdit{
     
-    [_gridView setIsEdit:NO];
-    
-    for (BookCellView *cell in [_gridView bookCells]) {
-        //不是空位
-        if ([cell isHas]) {
-            [cell cancelEditBtn];
-        }
-    }
+    [self setEdit:NO];
 }
 
 - (void)setParamBookDic:(NSDictionary *)paramBookDic{
@@ -790,59 +865,35 @@
     _paramBookDic =paramBookDic;
 }
 
-//判断目录是否存在 如果不存在创建
-- (void)createPath:(NSString *)path{
-    NSFileManager *fm =[NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:path]) {
-        BOOL result =[fm createDirectoryAtPath:path 
-                   withIntermediateDirectories:YES
-                                    attributes:nil
-                                         error:nil];
-        if (!result) {
-            CCLog(@"------create %@:failed",path);
-        }
-    }
+
+
+
+//更新手册
+- (void)updateBookCell:(Book *)book atIndex:(NSUInteger)index{
+    
+    [self queryBookList];
+    
+    NSMutableDictionary *statusDic =[self.cellStatusDic objectForKey:[book downnum]];
+    
+    BookCellView *cell =[self createBookCell:book withStatusDic:statusDic atIndex:index];
+    
+    [self.gridView updateBookCell:cell atIndex:index];
 }
 
-- (void)clickDownloadListSelector:(id)sender{
+//添加新书
+- (void)addBookCell:(Book *)book{
     
-    [downloadListView setViewHidden:![downloadListView isHidden] withAnimation:YES];
+    [self queryBookList];
+    
+    NSUInteger index =[self.gridView getFirstEmptyCellIndex];
+    
+    NSMutableDictionary *statusDic =[cellStatusDic objectForKey:[book downnum]];
+    
+    BookCellView *cell =[self createBookCell:book withStatusDic:statusDic atIndex:index];
+    
+    [self.gridView updateBookCell:cell atIndex:index];
 }
 
-#pragma -mark DownloadListViewDelegate
-- (void)didDownloadFinished{
-    [self updateBooks];
-    [self.gridView reloadData];
-}
-
-//截取下载码和手册名称 返回temp
-- (Temp *)tempFromString:(NSString *)str{
-    
-    Temp *temp =nil;
-    NSDictionary *jsonData =[str objectFromJSONString];
-    
-    NSRange range1 =[str rangeOfString:@"&downnum=" options:NSBackwardsSearch];
-    NSRange range2 =[str rangeOfString:@"&name=" options:NSBackwardsSearch];
-    if (range1.location !=NSNotFound && range2.location !=NSNotFound) {
-        
-        NSString *tempStr =[str substringFromIndex:range1.location];
-        tempStr =[tempStr substringFromIndex:[tempStr rangeOfString:@"="].location+1];
-        
-        NSString *downnum =[tempStr substringToIndex:[tempStr rangeOfString:@"&"].location];
-        NSString *name =[tempStr substringFromIndex:[tempStr rangeOfString:@"="].location+1];
-        temp=[[Temp alloc] init];
-        [temp setName:name];
-        [temp setDownnum:downnum];
-    }else if(jsonData!=nil && [jsonData objectForKey:@"number"] !=[NSNull null]){
-        
-        temp=[[Temp alloc] init];
-        [temp setDownnum:[jsonData objectForKey:@"number"]];
-    
-    }else{
-        CCLog(@"Not the application of two-dimension code");
-    }
-    return temp;
-}
 
 //重构二维码内容
 - (NSString *)saxReader:(NSString *)str{
@@ -865,13 +916,33 @@
                                           withString:@"wsydlite://www.wsyd.com"];
 }
 
+- (void)openOrAddBook:(NSNotification *)noti{
+    
+    NSString *url =[noti object];
+    
+    [self openBookByURL:url];
+}
+
+
 - (void)openBookByURL:(NSString *)urlString{
     /**
      url:wsydlite://www.wsyd.com?downloadnum=%@&su=&st=&hash=
      */
     
-    if ([urlString isEqualToString:@""]) {
+    NSUInteger p1 =[urlString rangeOfString:@"?downloadnum="].location;
+    NSUInteger p2 =[urlString rangeOfString:@"&su="].location;
+    NSUInteger p3 =[urlString rangeOfString:@"&st="].location;
+    NSUInteger p4 =[urlString rangeOfString:@"hash="].location;
+    
+    if ([urlString isEqualToString:@""] &&(
+        p1 ==2147483647 ||
+        p2 ==2147483647 ||
+        p3 ==2147483647 ||
+        p4 ==2147483647))
+    {
         CCLog(@"URL resutlt is null");
+        //TODO 添加提示
+        [self showMessage:@"该二维码无法进行下载!"];
         return;
     }
     NSString *temp =[urlString substringFromIndex:([urlString rangeOfString:@"downloadnum="].location+[@"downloadnum=" length])];
@@ -899,60 +970,103 @@
         //数据库中不存在   添加一本手册
         Book *bk =[[Book alloc] init];
         [bk setDownnum:downnum];
+        [bk setSu:su];
+        [bk setSt:st];
+        [bk setHash:hash];
         [bk setStatus:STATUS_already_enter_code];
-        [DBUtils insertBook:book];
-        
-        
-        if ([NetWorkCheck checkReachable]) {
-            //有网络
-            formDataRequest = [[ASIFormDataRequest alloc] initWithURL:[NSURL URLWithString:DOWNLOAD_URL]];
+        [bk setOpenstatus:OPEN_STATUS_NO];
+        BOOL result =[DBUtils insertBook:bk];
+        if (result) {
+            //添加手册
+            [self addBookCell:bk];
             
-            [formDataRequest setDelegate:self];
-            [formDataRequest setShouldAttemptPersistentConnection:NO];
-            [formDataRequest setTimeOutSeconds:10];
-            [formDataRequest setPostValue:downnum forKey:@"downloadnum"];
-            [formDataRequest setPostValue:[TokenUtil getLocalToken] forKey:@"token"];
-            [formDataRequest setPostValue:[UserInfo getUID] forKey:@"uid"];
-            [formDataRequest setPostValue:st forKey:@"st"];
-            [formDataRequest setPostValue:su forKey:@"su"];
-            [formDataRequest setPostValue:hash forKey:@"hash"];
-            
-            [formDataRequest setUserInfo:[NSDictionary dictionaryWithObject:REQUEST_TYPE_DOWNNUM_CHECK forKey:@"type"]];
-            [formDataRequest startAsynchronous];
+        }   
+        
+        if ([NetWorkCheck checkReachable] && result) {
+            //有网络  发送验证下载码
+            [self startVerifyHandle];
         }
         return;
-    }
-    if ([[book status] isEqualToString:STATUS_downloading]) {
-        //当前手册下载中  滚动到相应位置
+    }else{
         
-        return;
+        [self.gridView scrollToCellAtIndex:[self.gridView getIndexByDownnum:[book downnum]]];
     }
+    
 }
+
+//列表验证下载码
+- (void)didBookListVerify:(NSNotification *)noti{
+    
+    CCLog(@"开始执行列表检查......");
+    [self startVerifyHandle];
+}
+
 
 //处理验证下载码结果
 - (void)handleCheckInfo:(ASIHTTPRequest *) request{
     
-    NSDictionary *data = [(NSDictionary *)[[request responseData] objectFromJSONData]
-                          objectForKey:@"handbookMsg"];
+    NSArray *datas = [(NSDictionary *)[[request responseData] objectFromJSONData]
+                          objectForKey:@"handbookMsgs"];
     NSString *httpHeader =[(NSDictionary *)[[request responseData] objectFromJSONData] objectForKey:@"httpImage"];
     //更新httpHeader
     [[HttpHeader shareInstance] updateHttpHeader:httpHeader];
     
-    if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
+    
+    
+    for (NSDictionary *data in datas) {
         
-        NSDictionary *book =[data objectForKey:@"book"];
-        //存储数据到数据库
+        
         Book *b =[DBUtils queryBookByDownnum:[data objectForKey:@"downnum"]];
-        [b setName:[book objectForKey:@"name"]];
-        [b setDir:[book objectForKey:@"downnum"]];
-        [b setIcon:[book objectForKey:@"icon"]];
-        [b setZip:[book objectForKey:@"zip"]];
-        [b setBookId:[book objectForKey:@"id"]];
         
-        [DBUtils updateBook:b];
+        if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
+            
+            NSDictionary *book =[data objectForKey:@"book"];
+            
+            [b setName:[book objectForKey:@"name"]];
+            [b setDir:[book objectForKey:@"downnum"]];
+            [b setIcon:[book objectForKey:@"icon"]];
+            [b setZip:[book objectForKey:@"zip"]];
+            [b setBookId:[book objectForKey:@"id"]];
+            
+            //判断是否有正在下载的
+            if ([DBUtils isHasStatusDownloading]) {
+                [b setStatus:STATUS_downloading_waitting];
+            }else{
+                [b setStatus:STATUS_downloading];
+                
+            }
+            
+        }
+        else if([@"not_found" isEqualToString:[data objectForKey:@"status"]]){
+            
+            [b setStatus:STATUS_already_enter_code_not_found];
+            [self showMessage:@"该手册没找到"];
+        }
+        else if([@"not_share" isEqualToString:[data objectForKey:@"status"]]){
+            
+            [b setStatus:STATUS_already_enter_code_not_share];
+            [self showMessage:@"该手册尚未发布"];
+        }
+        else if([@"out_date" isEqualToString:[data objectForKey:@"status"]]){
+            
+            [b setStatus:STATUS_already_enter_code_out_date];
+            [self showMessage:@"该手册已过期"];
+        }
+        
+        BOOL result =[DBUtils updateBook:b];
+        if (result) {
+            
+            [self updateBookCell:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
+            
+            if ([STATUS_downloading isEqualToString:[b status]]) {
+                [self startDownload:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
+            }
+        }
         
     }
+    
 }
+
 
 - (void)toBookView:(Book *)book{
     
@@ -1006,5 +1120,42 @@
     }
     return NO;
 }
+
+//启动验证机制
+- (void)startVerifyHandle{
+    
+    if (!verifyHandle) {
+        verifyHandle =[[VerifyHandle alloc] init];
+        [verifyHandle setDelegate:self];
+    }
+    
+    if (![verifyHandle isAction]) {
+        [verifyHandle startVerify];
+    }
+    
+    isVerify =[verifyHandle isAction];
+}
+
+#pragma -mark VerifyHandleDelegate
+- (NSMutableArray *)verifyDataSource:(VerifyHandle *)verifyHandle{
+    
+    return [DBUtils queryAllBookNotVerify];
+}
+#pragma -mark VerifyHandleDelegate
+- (void)verifyFinished:(VerifyHandle *)verifyHandle request:(ASIHTTPRequest *)request{
+    
+    [self handleCheckInfo:request];
+    
+    isVerify = NO;
+    
+}
+#pragma -mark VerifyHandleDelegate
+- (void)verifyFailed:(VerifyHandle *)verifyHandle request:(ASIHTTPRequest *)request{
+    
+    CCLog(@"验证请求失败:%@",request.error);
+    isVerify =NO;
+}
+
+
 
 @end

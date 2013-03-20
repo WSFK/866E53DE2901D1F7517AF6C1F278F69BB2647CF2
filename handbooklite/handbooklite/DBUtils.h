@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "Book.h"
-#import "Temp.h"
 
 @interface DBUtils : NSObject
 
-+ (void)insertBook:(Book *)book;
++ (BOOL)insertBook:(Book *)book;
 
 + (NSMutableArray *)queryAllBooks;
 
@@ -29,17 +28,14 @@
 
 + (BOOL)updateBook:(Book *) book;
 
++ (BOOL)isHasStatusDownloading;
 
+//查询所有未验证的手册
++ (NSMutableArray *)queryAllBookNotVerify;
 
-//下载缓存表
-+ (BOOL)insertTemp:(Temp *)temp;
++ (BOOL)updateBookStatus:(NSString *)status downnum:(NSString *)downnum;
 
-+ (NSMutableArray *)queryAllTemps;
++ (BOOL)updateOpenStatus:(NSString *)status downnum:(NSString *)downnum;
 
-+ (BOOL)deleteTempById:(NSInteger)tempId;
-
-+ (Temp *)queryTempById:(NSInteger)tempId;
-
-+ (BOOL)isExisttempByDownnum:(NSString *)downnum;
 
 @end

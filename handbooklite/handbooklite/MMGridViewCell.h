@@ -21,6 +21,9 @@
 
 #import <UIKit/UIKit.h>
 
+#define TYPE_CELL_EMPTY @"emptyType"
+#define TYPE_CELL_BOOK  @"bookType"
+
 @class MMGridView;
 
 @interface MMGridViewCell : UIView 
@@ -28,6 +31,7 @@
     MMGridView *gridView;
     NSInteger index;
     BOOL _isClick;
+    NSString *type;
     BOOL _isHas;//本地是否存在手册
 }
 
@@ -35,5 +39,6 @@
 @property (nonatomic, readonly) NSInteger index;
 @property (nonatomic, assign) BOOL isClick;
 @property (nonatomic, assign) BOOL isHas;
+@property (nonatomic, copy) NSString *type;
 
 @end

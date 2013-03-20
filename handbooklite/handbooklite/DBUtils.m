@@ -13,41 +13,31 @@
 @implementation DBUtils
 
 
-+ (void)insertBook:(Book *)book{
++ (BOOL)insertBook:(Book *)book{
     
     FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
     [db beginTransaction];
     
-    [db executeUpdate:@"insert into t_book (name,downnum,dir,zip,icon,bookid) values(?,?,?,?,?,?)",
+    BOOL result =[db executeUpdate:@"insert into t_book (name,downnum,dir,zip,icon,bookid,status,su,st,hash,openstatus) values(?,?,?,?,?,?,?,?,?,?,?)",
         book.name,
         book.downnum,
         book.dir,
         book.zip,
         book.icon,
-        book.bookId];
+        book.bookId,
+        book.status,
+        book.su,
+        book.st,
+        book.hash,
+        book.openstatus];
     
     [db commit];
     
     [[WSYDDatabase newInstance] closeDb];
-}
-
-+ (BOOL)insertTemp:(Temp *)temp{
     
-    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
-    [db beginTransaction];
-    
-    BOOL result =NO;
-
-    result =[db executeUpdate:@"insert into t_temp (name,downnum,savedate) values(?,?,?)",
-     temp.name,
-     temp.downnum,
-     temp.savedate];
-    
-    [db commit];
-    
-    [[WSYDDatabase newInstance] closeDb];
     return result;
 }
+
 
 + (NSMutableArray *)queryAllBooks{
     
@@ -67,6 +57,12 @@
         [book setZip:[res stringForColumn:@"zip"]];
         [book setIcon:[res stringForColumn:@"icon"]];
         [book setBookId:[res stringForColumn:@"bookid"]];
+        [book setStatus:[res stringForColumn:@"status"]];
+        [book setSu:[res stringForColumn:@"su"]];
+        [book setSt:[res stringForColumn:@"st"]];
+        [book setHash:[res stringForColumn:@"hash"]];
+        [book setOpenstatus:[res stringForColumn:@"openstatus"]];
+        
         [books addObject:book];
     }
     
@@ -74,26 +70,6 @@
     return books;
 }
 
-+ (NSMutableArray *)queryAllTemps{
-    
-    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
-    
-    FMResultSet *res =[db executeQuery:@"SELECT * FROM t_temp order by id"];
-    
-    NSMutableArray *temps = [[NSMutableArray alloc] init];
-    while ([res next]) {
-        
-        Temp *temp =[[Temp alloc] init];
-        [temp setID:[res intForColumn:@"id"]];
-        [temp setName:[res stringForColumn:@"name"]];
-        [temp setDownnum:[res stringForColumn:@"downnum"]];
-        [temp setSavedate:[res dateForColumn:@"savedate"]];
-        [temps addObject:temp];
-    }
-    
-    [[WSYDDatabase newInstance] closeDb];
-    return temps;
-}
 
 + (BOOL)isExistBookByDownnum:(NSString *)downnum{
     
@@ -109,19 +85,6 @@
     return NO;
 }
 
-+ (BOOL)isExisttempByDownnum:(NSString *)downnum{
-    
-    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
-    FMResultSet *res =[db executeQuery:@"SELECT * FROM t_temp where downnum =?",downnum];
-    
-    if([res next]){
-        
-        [[WSYDDatabase newInstance] closeDb];
-        return YES;
-    }
-    [[WSYDDatabase newInstance] closeDb];
-    return NO;
-}
 
 + (BOOL)deleteBookById:(NSInteger)bookId{
     FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
@@ -155,23 +118,6 @@
     return result;
 }
 
-+ (BOOL)deleteTempById:(NSInteger)bookId{
-    
-    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
-    
-    BOOL result =NO;
-    
-    if([db beginTransaction]){
-        
-        result =[db executeUpdate:@"delete from t_temp where id=?",[NSNumber numberWithInteger:bookId]];
-        
-        [db commit];
-    }
-    [[WSYDDatabase newInstance] closeDb];
-    
-    return result;
-}
-
 + (Book *)queryBookById:(NSInteger)bookId{
     
     FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
@@ -186,6 +132,11 @@
         [book setZip:[res stringForColumn:@"zip"]];
         [book setIcon:[res stringForColumn:@"icon"]];
         [book setBookId:[res stringForColumn:@"bookid"]];
+        [book setStatus:[res stringForColumn:@"status"]];
+        [book setSu:[res stringForColumn:@"su"]];
+        [book setSt:[res stringForColumn:@"st"]];
+        [book setHash:[res stringForColumn:@"hash"]];
+        [book setOpenstatus:[res stringForColumn:@"openstatus"]];
         
         [[WSYDDatabase newInstance] closeDb];
         
@@ -195,24 +146,6 @@
     return nil;
 }
 
-+ (Temp *)queryTempById:(NSInteger)bookId{
-    
-    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
-    
-    FMResultSet *res =[db executeQuery:@"select * from t_temp where id =?",[NSNumber numberWithInteger:bookId]];
-    if([res next]){
-        Temp *temp =[[Temp alloc] init];
-        [temp setID:[res intForColumn:@"id"]];
-        [temp setName:[res stringForColumn:@"name"]];
-        [temp setDownnum:[res stringForColumn:@"downnum"]];
-        [temp setSavedate:[res dateForColumn:@"savedate"]];
-        
-        [[WSYDDatabase newInstance] closeDb];
-        return temp;
-    }
-    [[WSYDDatabase newInstance] closeDb];
-    return nil;
-}
 
 + (Book *)queryBookByDownnum:(NSString *)downnum{
     
@@ -232,6 +165,7 @@
         [book setSu:[res stringForColumn:@"su"]];
         [book setSt:[res stringForColumn:@"st"]];
         [book setHash:[res stringForColumn:@"hash"]];
+        [book setOpenstatus:[res stringForColumn:@"openstatus"]];
         
         [[WSYDDatabase newInstance] closeDb];
         
@@ -246,10 +180,9 @@
     FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
     
     BOOL result =NO;
-    
     if([db beginTransaction]){
         
-        result =[db executeUpdate:@"update t_book set name=?,downnum=?,dir=?,zip=?,icon=?,bookid=?,status=? where id=?",
+        result =[db executeUpdate:@"update t_book set name=?,downnum=?,dir=?,zip=?,icon=?,bookid=?,status=?,openstatus=? where id=?",
                  book.name,
                  book.downnum,
                  book.dir,
@@ -257,6 +190,7 @@
                  book.icon,
                  book.bookId,
                  book.status,
+                 book.openstatus,
                  [NSNumber numberWithInteger:book.ID]];
         
         [db commit];
@@ -266,5 +200,83 @@
     return result;
 }
 
++ (BOOL)isHasStatusDownloading{
+    
+    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
+    
+    BOOL result =NO;
+    FMResultSet *res =[db executeQuery:@"select id from t_book where status =?",STATUS_downloading];
+    
+    if ([res next]) {
+        result =YES;
+    }
+    return result;
+}
+
++ (NSMutableArray *)queryAllBookNotVerify{
+    
+    FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
+    
+    FMResultSet *res =[db executeQuery:@"select * from t_book where status =?",STATUS_already_enter_code];
+    
+    NSMutableArray *books = [[NSMutableArray alloc] init];
+    while ([res next]) {
+        
+        Book *book = [[Book alloc] init];
+        [book setID:[res intForColumn:@"id"]];
+        [book setName:[res stringForColumn:@"name"]];
+        [book setDownnum:[res stringForColumn:@"downnum"]];
+        [book setDir:[res stringForColumn:@"dir"]];
+        [book setZip:[res stringForColumn:@"zip"]];
+        [book setIcon:[res stringForColumn:@"icon"]];
+        [book setBookId:[res stringForColumn:@"bookid"]];
+        [book setStatus:[res stringForColumn:@"status"]];
+        [book setSu:[res stringForColumn:@"su"]];
+        [book setSt:[res stringForColumn:@"st"]];
+        [book setHash:[res stringForColumn:@"hash"]];
+        [book setOpenstatus:[res stringForColumn:@"openstatus"]];
+        
+        [books addObject:book];
+    }
+    
+    [[WSYDDatabase newInstance] closeDb];
+    return books;
+}
+
++ (BOOL)updateBookStatus:(NSString *)status downnum:(NSString *)downnum{
+    
+    FMDatabase *db =[WSYDDatabase newInstance].fmdatabse;
+    
+    BOOL result =NO;
+    
+    if ([db beginTransaction]) {
+        
+        result =[db executeUpdate:@"update t_book set status=? where downnum=?",status,downnum];
+        
+        [db commit];
+    }
+    
+    [[WSYDDatabase newInstance] closeDb];
+    
+    return result;
+}
+
++ (BOOL)updateOpenStatus:(NSString *)status downnum:(NSString *)downnum{
+    
+    FMDatabase *db =[WSYDDatabase newInstance].fmdatabse;
+    
+    BOOL result =NO;
+    
+    if ([db beginTransaction]) {
+        
+        result =[db executeUpdate:@"update t_book set openstatus=? where downnum=?",status,downnum];
+        
+        [db commit];
+    }
+    
+    [[WSYDDatabase newInstance] closeDb];
+    
+    return result;
+}
 
 @end

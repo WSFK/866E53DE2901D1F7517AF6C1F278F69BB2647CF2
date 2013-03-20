@@ -47,6 +47,10 @@ typedef enum {
 - (void)gridView:(MMGridView *)gridView didSelectCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index;
 - (void)gridView:(MMGridView *)gridView didDoubleTapCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index;
 - (void)gridView:(MMGridView *)gridView changedPageToIndex:(NSUInteger)index;
+//自定义删除
+- (void)gridView:(MMGridView *)gridView deleteCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index;
+//自定义下载完成
+- (void)gridView:(MMGridView *)gridView finishedCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index error:(NSString *)error;
 @end
 
 // ----------------------------------------------------------------------------------
@@ -64,9 +68,11 @@ typedef enum {
     NSUInteger cellMargin;
     GridLayoutStyle layoutStyle;
     BOOL isReloadData;
-    NSMutableArray *bookCells;
+    NSMutableDictionary *bookCellDic;
     
-    BOOL isEdit;
+    NSUInteger numberOfEmptyCell;
+    
+    BOOL edit;
 }
 
 @property (nonatomic, retain, readonly) UIScrollView *scrollView;
@@ -80,11 +86,19 @@ typedef enum {
 @property (nonatomic, readonly) NSUInteger numberOfTatalRows;
 @property (nonatomic) GridLayoutStyle layoutStyle;
 @property (nonatomic, assign) BOOL isReloadData;
-@property (nonatomic, retain) NSMutableArray *bookCells;
+@property (nonatomic, retain) NSMutableDictionary *bookCellDic;
 
-@property (nonatomic, assign) BOOL isEdit;
+@property (nonatomic) NSUInteger numberOfEmptyCell;
+
 
 - (void)reloadData;
-- (MMGridViewCell *)gridViewCellAtIndex:(int)index;
+- (void)setEdit:(BOOL)editable;
+- (BOOL)edit;
+- (void)updateBookCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index;
+- (NSUInteger)getFirstEmptyCellIndex;
+- (NSUInteger)getIndexByDownnum:(NSString *)downnum;
 
+- (void)scrollToCellAtIndex:(NSUInteger)index;
+
+- (BOOL)isHasBookCell;//是否有手册
 @end

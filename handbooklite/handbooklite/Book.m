@@ -10,12 +10,12 @@
 
 @implementation Book
 
-@synthesize ID,name,downnum,dir,zip,icon,bookId,status,su,st,hash;
+@synthesize ID,name,downnum,dir,zip,icon,bookId,status,su,st,hash,openstatus;
 
 
 - (NSString *)getIconName{
     
-    return icon?[icon lastPathComponent]:@"";
+    return icon?[icon lastPathComponent]:@"null";
 }
 
 @end

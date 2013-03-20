@@ -33,6 +33,7 @@
 @synthesize index;
 @synthesize isClick =_isClick;
 @synthesize isHas =_isHas;
+@synthesize type;
 
 
 - (void)dealloc
