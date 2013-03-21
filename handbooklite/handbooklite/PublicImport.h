@@ -24,4 +24,6 @@
 
 #define LOGFILEPATH [CACHEPATH stringByAppendingString:@"/log.json"]
 
+#define LOG_TYPE_OPEN_PUSH @"openPush"
+#define LOG_TYPE_NEW_CLICK @"newClick"
 #endif

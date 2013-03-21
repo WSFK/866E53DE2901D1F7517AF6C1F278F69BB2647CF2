@@ -122,7 +122,7 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 - (IBAction)clickEditSelector:(id)sender;
 
 //重构二维码
-- (NSString *)saxReader:(NSString *)str;
+- (NSString *)saxReader:(NSString *)str isPushVerify:(BOOL)isPushVerify;
 
 //通过URL打开手册
 - (void)openBookByURL:(NSString *)urlString;

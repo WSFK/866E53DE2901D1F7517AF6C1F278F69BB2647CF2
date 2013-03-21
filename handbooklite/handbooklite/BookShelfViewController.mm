@@ -253,6 +253,9 @@
                                          otherButtonTitles:@"确  定", nil];
   [alert setTag:ALERT_PUSH_DOWNLOAD];
   [alert setPushDownnum:pushDownnum];
+    
+    //记录日志
+    [Util writeToLog:USERUUID type:LOG_TYPE_OPEN_PUSH bookId:pushDownnum];
   
   return alert;
 }
@@ -278,7 +281,7 @@
 - (void)didComfirm{
     
     //添加帮助手册
-    [self openBookByURL:[self saxReader:HELP_DOWNNUM]];
+    [self openBookByURL:[self saxReader:HELP_DOWNNUM isPushVerify:NO]];
     
     NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
     [defaults setObject:@"YES" forKey:@"prompt"];
@@ -526,6 +529,11 @@
         
         if ([STATUS_already_download isEqualToString:[book status]] && [self isHasBookLocation:book]) {
             
+            if ([OPEN_STATUS_NO isEqualToString:[book status]]) {
+                
+                //记录日志
+                [Util writeToLog:USERUUID type:LOG_TYPE_NEW_CLICK bookId:[book downnum]];
+            }
             //更新状态
             [DBUtils updateOpenStatus:OPEN_STATUS_YES downnum:[book  downnum]];
             [[(BookCellView *)cell iconNewImgView] setHidden:YES];
@@ -754,7 +762,7 @@
 #pragma -mark DownloadAlertViewDelegate
 - (void)commitWithText:(NSString *)text{
     
-    [self openBookByURL:[self saxReader:text]];
+    [self openBookByURL:[self saxReader:text isPushVerify:NO]];
     
 }
 
@@ -791,7 +799,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"TWOCODEWITHRRESULT" object:nil];
     tc.isSendTwoCodeNoti = NO;
     NSString *result = [notifi object];
-    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result] afterDelay:1.0];
+    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result isPushVerify:NO] afterDelay:1.0];
   }
   
 }
@@ -812,7 +820,7 @@
       
       NSString *pushDownnum =[alert pushDownnum];
       
-      [self openBookByURL:[self saxReader:pushDownnum]];
+      [self openBookByURL:[self saxReader:pushDownnum isPushVerify:YES]];
     }
   }
   
@@ -902,7 +910,7 @@
 
 
 //重构二维码内容
-- (NSString *)saxReader:(NSString *)str{
+- (NSString *)saxReader:(NSString *)str isPushVerify:(BOOL)isPushVerify{
     /**
      例子：http://ms.thoughtfactory.com.cn/client/interface_qxz?downloadnum=TFFLHELP&su=123&st=20130305122323&hash=5
      
@@ -913,6 +921,13 @@
         return @"";
     }
     if (str.length<10) {
+        
+        if (isPushVerify) {
+            
+            NSString *param =[NSString stringWithFormat:@"downloadnum=%@&su=push&st=%@",str,[Util getDayString]];
+            
+            return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?%@&hash=%i",param,[param hash]];
+        }
         return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?downloadnum=%@&su=0&st=0&hash=0",str];
         
     }
