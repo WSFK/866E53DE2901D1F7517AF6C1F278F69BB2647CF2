@@ -506,6 +506,13 @@
     }
 }
 
+- (void)cellWasClickPushNumberShow:(MMGridViewCell *)cell{
+    
+    if (delegate && [delegate respondsToSelector:@selector(gridView:didPushNumberShowCell:)]) {
+        
+        [delegate gridView:self didPushNumberShowCell:cell];
+    }
+}
 
 - (void)updateCurrentPageIndex
 {

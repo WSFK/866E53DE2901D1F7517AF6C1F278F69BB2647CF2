@@ -24,9 +24,6 @@
 #define OPEN_STATUS_YES                         @"yes"//已打开
 #define OPEN_STATUS_NO                          @"no"//未打开
 
-#define STATUS_PUSH_YES                         @"yes"//有推动信息
-#define STATUS_PUSH_NO                          @"no"//无推送信息
-
 @interface Book : NSObject{
     
     NSInteger ID;

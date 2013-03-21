@@ -461,6 +461,7 @@
             iconImage =[UIImage imageNamed:@"default_icon.png"];
             //iconImage =[UIImage imageNamed:@"landscape_bg.png"];
             [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
+            name =@"Loading";
         }
         
         if ([STATUS_downloading_exception isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
@@ -939,11 +940,11 @@
     NSUInteger p3 =[urlString rangeOfString:@"&st="].location;
     NSUInteger p4 =[urlString rangeOfString:@"hash="].location;
     
-    if ([urlString isEqualToString:@""] &&(
-        p1 ==2147483647 ||
-        p2 ==2147483647 ||
-        p3 ==2147483647 ||
-        p4 ==2147483647))
+    if ([urlString isEqualToString:@""] ||
+        (p1 ==NSNotFound ||
+         p2 ==NSNotFound ||
+         p3 ==NSNotFound ||
+         p4 ==NSNotFound))
     {
         CCLog(@"URL resutlt is null");
         //TODO 添加提示

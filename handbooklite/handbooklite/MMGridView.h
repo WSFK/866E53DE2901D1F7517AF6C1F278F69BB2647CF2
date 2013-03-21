@@ -51,6 +51,8 @@ typedef enum {
 - (void)gridView:(MMGridView *)gridView deleteCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index;
 //自定义下载完成
 - (void)gridView:(MMGridView *)gridView finishedCell:(MMGridViewCell *)cell atIndex:(NSUInteger)index error:(NSString *)error;
+//自定义点击推送
+- (void)gridView:(MMGridView *)gridView didPushNumberShowCell:(MMGridViewCell *)cell;
 @end
 
 // ----------------------------------------------------------------------------------
