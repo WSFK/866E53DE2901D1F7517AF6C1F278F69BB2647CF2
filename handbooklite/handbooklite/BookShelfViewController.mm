@@ -1036,6 +1036,10 @@
         
         Book *b =[DBUtils queryBookByDownnum:[data objectForKey:@"downnum"]];
         
+        if (b == nil) {
+            continue;
+        }
+        
         if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
             
             NSDictionary *book =[data objectForKey:@"book"];
