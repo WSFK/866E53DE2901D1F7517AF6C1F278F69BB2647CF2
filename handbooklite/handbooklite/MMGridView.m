@@ -234,7 +234,11 @@
         }
         
         isReloadData =NO;
-         
+        
+        if (![self isHasBookCell]) {
+            
+            [self setEdit:NO];
+        }
         
     }
     

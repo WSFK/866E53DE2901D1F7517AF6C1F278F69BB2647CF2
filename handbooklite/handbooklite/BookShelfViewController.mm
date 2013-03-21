@@ -376,10 +376,6 @@
         book =[_books objectAtIndex:index];
     }
     
-    if (![self.gridView isHasBookCell]) {
-        
-        [self.gridView setEdit:NO];
-    }
     
     NSMutableDictionary *statusDic =[cellStatusDic objectForKey:[book downnum] ==nil
                                      ?[NSString stringWithFormat:@"empty%i",index]
@@ -500,10 +496,6 @@
         
     }
     
-    if (![self.gridView isHasBookCell]) {
-        
-        [self.gridView setEdit:NO];
-    }
     
     [cell showDeleteBtn:self.gridView.edit];
   NSUInteger pushCount =[DBUtils queryCountOfPushMsgByDownnum:[book downnum]];
