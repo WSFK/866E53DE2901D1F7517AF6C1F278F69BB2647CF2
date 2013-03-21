@@ -376,6 +376,11 @@
         book =[_books objectAtIndex:index];
     }
     
+    if (![self.gridView isHasBookCell]) {
+        
+        [self.gridView setEdit:NO];
+    }
+    
     NSMutableDictionary *statusDic =[cellStatusDic objectForKey:[book downnum] ==nil
                                      ?[NSString stringWithFormat:@"empty%i",index]
                                                                :[book downnum]];
@@ -917,10 +922,10 @@
      重构后：wsydlite://www.wsyd.com?downloadnum=TFFLHELP&su=123&st=20130305122323&hash=5
      */
     
-    if (!str) {
+    if (!str || str.length==0) {
         return @"";
     }
-    if (str.length<10) {
+    if (0 < str.length < 10) {
         
         if (isPushVerify) {
             
