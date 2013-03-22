@@ -58,18 +58,16 @@
 
 /**
  
- {
- "verifyParam": [
-                    {
-                        "downnum": "123",
-                        "token": "122232",
-                        "uid": "121",
-                        "st": "201202023",
-                        "su": "23232",
-                        "hash": "5"
-                    }
-                ]
- }
+ [
+    {
+        "downnum": "123",
+        "token": "122232",
+        "uid": "121",
+        "st": "201202023",
+        "su": "23232",
+        "hash": "5"
+    }
+ ]
  
  */
 
@@ -77,7 +75,7 @@
     
     NSMutableString *param =[[NSMutableString alloc] init];
     
-    [param appendString:@"{\"verifyParam\":["];
+    [param appendString:@"["];
     for (Book *book in books) {
         
         [param appendString:@"{"];
@@ -91,7 +89,7 @@
         [param appendString:@","];
     }
     
-    [param appendString:@"]}"];
+    [param appendString:@"]"];
     
     
     NSUInteger index =[param rangeOfString:@"," options:NSBackwardsSearch].location;

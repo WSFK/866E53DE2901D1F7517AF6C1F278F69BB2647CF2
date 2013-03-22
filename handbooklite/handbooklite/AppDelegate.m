@@ -176,6 +176,28 @@
 {
      // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    
+    __block UIBackgroundTaskIdentifier bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
+        
+        [application endBackgroundTask:bgTask];
+        
+        bgTask = UIBackgroundTaskInvalid;
+        
+    }];
+    
+    
+    // Start the long-running task and return immediately.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
+                                             0), ^{
+        // Do the work associated with the task.
+        
+        [NSThread sleepForTimeInterval:30];
+        
+        
+        [application endBackgroundTask:bgTask];
+        
+        bgTask = UIBackgroundTaskInvalid;
+    });
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -187,11 +209,17 @@
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     
+    //通知验证下载码
+    [self performSelector:@selector(postVerifyNotification) withObject:nil afterDelay:1.0];
+    
+}
+
+- (void)postVerifyNotification{
+    
     if ([NetWorkCheck checkReachable]) {
         //验证下载码有效性
         [[NSNotificationCenter defaultCenter] postNotificationName:@"verify_downloadnum_notification" object:nil];
     }
-    
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

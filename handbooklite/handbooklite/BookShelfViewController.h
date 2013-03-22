@@ -23,7 +23,6 @@
 
 @interface BookShelfViewController : UIViewController
 <ASIHTTPRequestDelegate,
-ZXingDelegate,
 MMGridViewDelegate,
 MMGridViewDataSource,
 DownloadAlertViewDelegate,
@@ -32,7 +31,6 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 
 {
     
-    ASINetworkQueue *_networkQueue;
     NSString *_books_path;
     
     
@@ -42,7 +40,6 @@ UIAlertViewDelegate,VerifyHandleDelegate>
     NSMutableArray *_books;
     NSMutableDictionary *cellStatusDic;
     IBOutlet MMGridView *_gridView;
-    
     
     
     
@@ -79,7 +76,6 @@ UIAlertViewDelegate,VerifyHandleDelegate>
     
     
 }
-@property (nonatomic ,strong) ASINetworkQueue *networkQueue;
 @property (nonatomic ,copy) NSString *books_path;
 
 

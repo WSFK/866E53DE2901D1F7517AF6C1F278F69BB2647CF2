@@ -26,7 +26,6 @@
 
 @implementation BookShelfViewController
 
-@synthesize networkQueue =_networkQueue;
 @synthesize books_path =_books_path;
 
 
@@ -315,7 +314,6 @@
   CCLog(@"===> BookShelf unload!");
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-    self.networkQueue =nil;
     self.books_path =nil;
     self.books =nil;
     
@@ -334,6 +332,8 @@
     self.progress =nil;
     
     self.downloadTempDic =nil;
+    
+    downloadQueue =nil;
     
 }
 
@@ -480,11 +480,18 @@
             
         }
         
-      if ([STATUS_downloading_suspend isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
+        if ([STATUS_downloading_suspend isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
         
-        [cell.suspendView setHidden:NO];
-        [cell.lbdling setHidden:YES];
-      }
+           [cell.suspendView setHidden:NO];
+           [cell.lbdling setHidden:YES];
+        }
+        
+        if ([STATUS_downloading_waitting isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
+            
+            [cell.suspendView setHidden:YES];
+            [cell.lbdling setHidden:NO];
+            [cell.lbdling setText:@"等待中..."];
+        }
       
         [cell reloadBookIcon:cell iconImage:iconImage];
         
@@ -543,10 +550,9 @@
             [STATUS_downloading_suspend isEqualToString:[book status]] ||
             [STATUS_downloading_exception isEqualToString:[book status]]) {
             
-            if (![DBUtils isHasStatusDownloading]) {
-                
-                [self checkNetWorkToDownload:book index:index];
-            }
+            //加入下载队列
+            [self addDownloadOperationByBook:book index:index];
+            
             return;
         }
         
@@ -614,6 +620,9 @@
         //更新数据库状态
         [DBUtils updateBookStatus:STATUS_downloading_exception downnum:downnum];
     }
+    
+    //从下载队列中移除
+    [operationArray removeObject:downnum];
     
     [self queryBookList];
 }
@@ -836,30 +845,35 @@
     [alert show];
 }
 
-- (void)setDownloadTemp:(Book *)book index:(NSUInteger)index{
+- (void)setDownloadTemp:(Book *)book index:(NSNumber *)index{
   
   if (!self.downloadTempDic) {
     self.downloadTempDic =[[NSMutableDictionary alloc] initWithCapacity:2];
   }
   
   [self.downloadTempDic setObject:book forKey:@"book"];
-  [self.downloadTempDic setObject:[NSNumber numberWithInt:index] forKey:@"index"];
+  [self.downloadTempDic setObject:index forKey:@"index"];
 }
 
-//检查网络类型 开始下载                         手册cell.index
-- (void)checkNetWorkToDownload:(Book *)book index:(NSUInteger)index{
-  [self setDownloadTemp:book index:index];
-  
-  //判断当前网络类型
-  if ([NetWorkCheck checkIs3G]) {
-    [self ShowNetWorkWarn];
+//检查网络类型 开始下载                     Book | index
+- (void)checkNetWorkToDownload:(NSMutableDictionary *)bookDic{
     
-  }else{
+    Book *book =[bookDic objectForKey:@"book"];
     
-    [self startDownloadAction];
-  }
-  
-  
+    NSNumber *num =[bookDic objectForKey:@"index"];
+    
+    [self setDownloadTemp:book index:num];
+    
+    //判断当前网络类型
+    if ([NetWorkCheck checkIs3G]) {
+        [self ShowNetWorkWarn];
+        
+    }else{
+        
+        [self startDownloadAction];
+    }
+    
+    
 }
 
 
@@ -1007,6 +1021,7 @@
         return;
     }else{
         
+        [self showMessage:@"该手册已经添加过了!"];
         [self.gridView scrollToCellAtIndex:[self.gridView getIndexByDownnum:[book downnum]]];
     }
     
@@ -1050,13 +1065,7 @@
             [b setZip:[book objectForKey:@"zip"]];
             [b setBookId:[book objectForKey:@"id"]];
             
-            //判断是否有正在下载的
-            if ([DBUtils isHasStatusDownloading]) {
-                [b setStatus:STATUS_downloading_waitting];
-            }else{
-                [b setStatus:STATUS_downloading];
-                
-            }
+            [b setStatus:STATUS_downloading_waitting];
             
         }
         else if([@"not_found" isEqualToString:[data objectForKey:@"status"]]){
@@ -1080,9 +1089,7 @@
             
             [self updateBookCell:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
             
-            if ([STATUS_downloading isEqualToString:[b status]]) {
-                [self checkNetWorkToDownload:b index:[self.gridView getIndexByDownnum:b.downnum]];
-            }
+            [self addDownloadOperationByBook:b index:[self.gridView getIndexByDownnum:b.downnum]];
         }
         
     }
@@ -1178,6 +1185,34 @@
     isVerify =NO;
 }
 
+//添加下载队列
+-(void)addDownloadOperationByBook:(Book *)book index:(NSUInteger)index{
+    
+    if (!downloadQueue) {
+        downloadQueue =[[NSOperationQueue alloc] init];
+        [downloadQueue setMaxConcurrentOperationCount:1];
+    }
+    
+    if (!operationArray) {
+        
+        operationArray =[[NSMutableArray alloc] init];
+    }
+    
+    if ([operationArray containsObject:[book downnum]] || [self isHasBookLocation:book]) {
+        return;
+    }
+    
+    NSMutableDictionary *bookDic =[[NSMutableDictionary alloc] init];
+    [bookDic setObject:book forKey:@"book"];
+    [bookDic setObject:[NSNumber numberWithInt:index] forKey:@"index"];
+    
+    NSInvocationOperation *operation =[[NSInvocationOperation alloc] initWithTarget:self
+                                                                           selector:@selector(checkNetWorkToDownload:)
+                                                                             object:bookDic];
+    [operationArray addObject:[book downnum]];
+    
+    [downloadQueue addOperation:operation];
+}
 
 
 @end

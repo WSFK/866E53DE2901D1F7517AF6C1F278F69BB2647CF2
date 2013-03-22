@@ -5,7 +5,6 @@
 //  Created by bao_wsfk on 13-3-15.
 //
 //  这里是验证下载码有效性的触发机制
-//  这是一个循环机制
 //  使用- (void)startVerify方法可以触发该机制
 //
 

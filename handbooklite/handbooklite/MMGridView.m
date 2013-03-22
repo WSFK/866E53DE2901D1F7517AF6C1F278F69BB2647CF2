@@ -350,7 +350,6 @@
     [emptyCell.title setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
     [emptyCell.title setTextColor:[UIColor whiteColor]];
     [emptyCell.title setTextAlignment:UITextAlignmentCenter];
-    emptyCell.title.text = [NSString stringWithFormat:@"点击获取"];
     
     emptyCell.backgroundView.image = [UIImage imageNamed:@"kw.png"];
     
