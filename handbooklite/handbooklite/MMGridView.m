@@ -254,9 +254,6 @@
     
     CGRect cellBounds = CGRectMake(0, 0,192,236);
     
-    CGSize contentSize = CGSizeMake(gridBounds.size.width, ([self currentTotalRows]+1) * cellBounds.size.height);
-    
-    [self.scrollView setContentSize:contentSize];
     
     CGPoint origin;
     
