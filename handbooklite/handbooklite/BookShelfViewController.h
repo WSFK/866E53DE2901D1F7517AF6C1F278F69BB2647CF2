@@ -43,6 +43,8 @@ UIAlertViewDelegate,VerifyHandleDelegate>
     
     
     
+    NSOperationQueue *downloadQueue;
+    NSMutableArray *operationArray;
     
     
     
