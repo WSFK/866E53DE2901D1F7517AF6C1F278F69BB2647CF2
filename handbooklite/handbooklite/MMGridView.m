@@ -287,6 +287,9 @@
         if (nu ==1) {
             
             //新增空位
+            CGSize contentSize = CGSizeMake(gridBounds.size.width, ([self currentTotalRows] +1) * cellBounds.size.height);
+            
+            [self.scrollView setContentSize:contentSize];
             
             int count =[bookCellDic count];
             
@@ -335,10 +338,10 @@
 - (NSUInteger)currentTotalRows{
     
     NSUInteger numberofCells = [self.bookCellDic count];
-    if (numberofCells % numberOfColumns == 0) {
-        return numberofCells / numberOfColumns;
+    if (numberofCells % numberOfRows == 0) {
+        return numberofCells / numberOfRows;
     } else {
-        return numberofCells / numberOfColumns + 1;
+        return numberofCells / numberOfRows + 1;
     }
 }
 
@@ -460,10 +463,10 @@
 {
     if (layoutStyle == VerticalLayout) {
         NSUInteger numberofCells = [self.dataSource numberOfCellsInGridView:self];
-        if (numberofCells % numberOfColumns == 0) {
-            return numberofCells / numberOfColumns;
+        if (numberofCells % numberOfRows == 0) {
+            return numberofCells / numberOfRows;
         } else {
-            return numberofCells / numberOfColumns + 1;
+            return numberofCells / numberOfRows + 1;
         }
     } else {
         return self.numberOfRows;
