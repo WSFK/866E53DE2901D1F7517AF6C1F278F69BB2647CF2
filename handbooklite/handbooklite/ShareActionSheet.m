@@ -15,7 +15,8 @@
 //@synthesize mailDelegate;
 
 + (ShareActionSheet *)actionSheetForTarget:(UIViewController *)target sendImage:(UIImage *)image
-                                   sendPdf:(NSString*) pdfFilePath sendPdfName:(NSString*) pdfFileName{
+                                   sendPdf:(NSString*) pdfFilePath sendPdfName:(NSString*) pdfFileName
+bookShareUrl:(NSString *)bookShareUrl {
     
   ShareActionSheet *as = [[ShareActionSheet alloc] initWithTitle:@"分享"
                                                         delegate:(id)self
@@ -28,6 +29,7 @@
   [as setPdfName:pdfFileName];
   [as addButtonWithTitle:@"新浪微博"];
   [as addButtonWithTitle:@"Email"];
+  [as setBookShareUrl:bookShareUrl];
 	return as;
 }
 
@@ -95,10 +97,10 @@
   [mailPicker addAttachmentData:imgData mimeType:@"image/png" fileName:@"image.png"];
 
   NSMutableString *mailContent = [[NSMutableString alloc] initWithString:_pdfName];
-  [mailContent appendFormat:@"扫描以下二维码，下载%@<br>",_pdfName];
-  [mailContent appendFormat:@"点击下载<a href='%@'>四维册阅读客户端</a><br>",HANDBOOKLITEAPPSTORE];
-  [mailContent appendFormat:@"点击查看<a href='%@'>pdf版</a><br>",_pdfPath];
-  [mailContent appendFormat:@"更多帮助内容请参见：<a href='%@'>%@</a><br>",WEBHELP,WEBHELP];
+  [mailContent appendFormat:@"扫描以下二维码，下载<a href='%@'>《%@》</a><br>",_pdfName,_bookShareUrl];
+//  [mail_bookShareUrllndFormat:@"点击下载<a href='%@'>四维册阅读客户端</a><br>",HANDBOOKLITEAPPSTORE];
+//  [mailContent appendFormat:@"点击查看<a href='%@'>pdf版</a><br>",_pdfPath];
+  [mailContent appendFormat:@"<a href='%@'>点击这里获取帮助</a><br>",WEBHELP];
   [mailContent appendString:@"感谢您使用四维册。"];
   
   [mailPicker setMessageBody:mailContent isHTML:YES];

@@ -23,15 +23,18 @@
   return nowString;
 }
 
++(NSString *) getShareTwoCodeUrlString:(NSString *) currentBookDownNum{
+  NSMutableString *shareUrl = [[NSMutableString alloc] init];
+  [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
+  [shareUrl appendFormat:@"?downloadnum=%@",currentBookDownNum];  //参数：下载码
+  [shareUrl appendFormat:@"&su=%@",USERUUID];                     //参数：分享者id
+  [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
+  [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];            //参数：hash
+  return shareUrl;
+}
+
 +(UIImage *) getShareTwoCode:(NSString *) currentBookDownNum{
-    NSMutableString *shareUrl = [[NSMutableString alloc] init];
-    [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
-    [shareUrl appendFormat:@"?downloadnum=%@",currentBookDownNum];  //参数：下载码
-    [shareUrl appendFormat:@"&su=%@",USERUUID];                     //参数：分享者id
-    [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
-    [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];            //参数：hash
-    
-    UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
+    UIImage *twImage = [QRCodeGenerator qrImageForString:[self getShareTwoCodeUrlString:currentBookDownNum] imageSize:139];
     return twImage;
 }
 
@@ -51,7 +54,32 @@
   [logArray addObject:[log JSONString]];
   
   NSString *outLog = [NSString stringWithFormat:@"{\"logs\":%@}", [logArray JSONString] ];
-  [outLog writeToFile:LOGFILEPATH atomically:YES];
+  [outLog writeToFile:LOGFILEPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
++(void *) commitLog{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if ([fm fileExistsAtPath:LOGFILEPATH]) {
+    NSString *logString = [NSString stringWithContentsOfFile:LOGFILEPATH encoding:NSUTF8StringEncoding error:nil];
+    NSString *commitString = [NSString stringWithFormat:@"loginfo=%@",logString];
+    NSData *commitData = [commitString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSURL * requestUrl = [[NSURL alloc] initWithString:LOGCOMMIT_URL];
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:requestUrl cachePolicy:0 timeoutInterval:10];
+    [request setHTTPBody:commitData];
+    [request setHTTPMethod:@"POST"];
+    
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    NSDictionary *json = [data objectFromJSONData];
+    
+    if (json != nil) {
+      NSDictionary *message = [json objectForKey:@"message"];
+      NSLog(@"%@",[message objectForKey:@"status"]);
+      if ([[message objectForKey:@"status"] isEqualToString:@"sucess"]) {
+        [fm removeItemAtPath:LOGFILEPATH error:nil];
+      }
+    }
+  }
+}
 @end

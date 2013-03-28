@@ -1643,7 +1643,9 @@ __VA_ARGS__ \
   actionSheet =[ShareActionSheet actionSheetForTarget:self
                                                               sendImage:[Util getShareTwoCode:currentBook.downnum]
                                                                 sendPdf:pdfDownUrl
-                                                            sendPdfName:currentBook.name];
+                                                            sendPdfName:currentBook.name
+                bookShareUrl:[Util getShareTwoCodeUrlString:currentBook.downnum]];
+  
   [actionSheet setMailDelegate:self];
   [actionSheet showInView:self.view];
 }

@@ -18,12 +18,16 @@
 #define DB_OLD_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db.sqlite3"]
 #define DB_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db_v3.sqlite3"]
 
-#define BASE_URL @"http://192.168.1.102:8085/"
+#define BASE_URL @"http://192.168.1.105:8085/"
 //#define BASE_URL @"http://ms.thoughtfactory.com.cn/"
 //#define BASE_URL [[[UIDevice currentDevice] model] isEqualToString:@"iPad Simulator"]?@"http://192.168.1.100:8085/":@"http://ms.thoughtfactory.com.cn/"
 
 #define VERIFY_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_bookInfo"]
 #define DOWNLOAD_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_qxz"]
+
+//日志提交接口
+#define LOGCOMMIT_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_sblog"]
+
 //请求pdf下载地址
 #define PDFREQUEST [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_pdfUrl?"]
 //网站帮助页面地址

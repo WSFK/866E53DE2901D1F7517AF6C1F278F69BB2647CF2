@@ -15,6 +15,9 @@
 
 +(NSString*) getDayString;    //获取当前时间字符串
 
+//拼接客户端分享下载链接
++(NSString *) getShareTwoCodeUrlString:(NSString *) currentBookDownNum;
+//把客户分享链接转为二维码
 +(UIImage *) getShareTwoCode:(NSString *) currentBookDownNum; //获取分享用二维码
 
 /**
@@ -23,4 +26,5 @@
  **/
 +(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId;
 
++(void *) commitLog;
 @end

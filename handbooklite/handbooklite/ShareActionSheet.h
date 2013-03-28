@@ -18,10 +18,12 @@
 @property (nonatomic, retain) UIImage *sendImage;
 @property (nonatomic, retain) NSString *pdfPath;
 @property (nonatomic, retain) NSString *pdfName;
+@property (nonatomic, retain) NSString *bookShareUrl;
 
 @property (nonatomic, assign) id<SendMailDelegate> mailDelegate;
 
-+ (ShareActionSheet *)actionSheetForTarget:(UIViewController *)target
-                                 sendImage:(UIImage *)image
-sendPdf:(NSString*) pdfFilePath sendPdfName:(NSString*) pdfFileName;
++ (ShareActionSheet *)actionSheetForTarget:(UIViewController *)target sendImage:(UIImage *)image
+                                   sendPdf:(NSString*) pdfFilePath sendPdfName:(NSString*) pdfFileName
+                              bookShareUrl:(NSString *)bookShareUrl;
+
 @end
