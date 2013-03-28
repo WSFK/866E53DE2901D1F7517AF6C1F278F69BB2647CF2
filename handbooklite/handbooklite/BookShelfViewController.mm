@@ -222,42 +222,38 @@
 
 //接受推送数据的提示
 - (void)showPushMessage:(NSNotification *)notifi{
-  
-  NSDictionary *pushData =[notifi object];
-  
-  NSString *msg =[pushData objectForKey:@"message"];
-  NSString *downnum =[pushData objectForKey:@"downnum"];
-  
-  //判断是否有手册
-  if ([DBUtils isExistBookByDownnum:downnum]) {
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_OF_PUSH_MSG_TO_SHOW object:pushData];
+    NSDictionary *pushData =[notifi object];
     
-  }else{
+    NSString *downnum =[pushData objectForKey:@"downnum"];
     
+    Book *book =[[Book alloc] init];
+    [book setDir:downnum];
     
-    PushMsgAlert *alert =[self createPushMsgAlert:msg withPushDownnum:downnum];
-    [alert show];
+    //判断是否有手册
+    if ([DBUtils isExistBookByDownnum:downnum] && [self isHasBookLocation:book]) {
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_OF_PUSH_MSG_TO_SHOW object:pushData];
+        
+    }
     
-  }
-  
 }
 
 - (PushMsgAlert *)createPushMsgAlert:(NSString *)msg withPushDownnum:(NSString *)pushDownnum{
-  
-  PushMsgAlert *alert =[[PushMsgAlert alloc] initWithTitle:@"四维册推送"
-                                                   message:msg
-                                                  delegate:self
-                                         cancelButtonTitle:@"取  消"
-                                         otherButtonTitles:@"确  定", nil];
-  [alert setTag:ALERT_PUSH_DOWNLOAD];
-  [alert setPushDownnum:pushDownnum];
+    
+    PushMsgAlert *alert =[[PushMsgAlert alloc] initWithTitle:@"四维册推送"
+                                                     message:msg
+                                           cancelButtonTitle:@"取  消"
+                                           otherButtonTitles:@"确  定", nil];
+    [alert setTag:ALERT_PUSH_DOWNLOAD];
+    [alert setPushDownnum:pushDownnum];
     
     //记录日志
     [Util writeToLog:USERUUID type:LOG_TYPE_OPEN_PUSH bookId:pushDownnum];
-  
-  return alert;
+    
+    return alert;
 }
+
 
 - (void)showPushAlert:(NSMutableArray *)pushMsgs{
   
@@ -333,7 +329,6 @@
     
     self.downloadTempDic =nil;
     
-    downloadQueue =nil;
     
 }
 
@@ -465,7 +460,7 @@
             iconImage =[UIImage imageNamed:@"default_icon.png"];
             //iconImage =[UIImage imageNamed:@"landscape_bg.png"];
             [cell.backgroundView setBackgroundColor:[UIColor clearColor]];
-            name =@"Loading";
+            name =@"Waitting";
         }
         
         if ([STATUS_downloading_exception isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
@@ -550,8 +545,14 @@
             [STATUS_downloading_suspend isEqualToString:[book status]] ||
             [STATUS_downloading_exception isEqualToString:[book status]]) {
             
-            //加入下载队列
-            [self addDownloadOperationByBook:book index:index];
+            if (![NetWorkCheck checkReachable]) {
+                return;
+            }
+            
+            [[(BookCellView *)cell suspendView] setHidden:YES];
+            [[(BookCellView *)cell lbdling] setHidden:NO];
+            [[(BookCellView *)cell lbdling] setText:@"等待中..."];
+            [self addDownloadTempArray:book index:index];
             
             return;
         }
@@ -570,6 +571,10 @@
             [STATUS_already_enter_code_out_date isEqualToString:[book status]] ||
             [STATUS_already_enter_code_suspend isEqualToString:[book status]])
         {
+            
+            if (![NetWorkCheck checkReachable]) {
+                return;
+            }
             [self startVerifyHandle];
             
         }
@@ -622,7 +627,14 @@
     }
     
     //从下载队列中移除
-    [operationArray removeObject:downnum];
+    [operationArray removeAllObjects];
+    
+    if ([@"cancel" isEqualToString:error]) {
+        
+        return;
+    }
+    
+    [self addOperationArray];
     
     [self queryBookList];
 }
@@ -647,7 +659,7 @@
 - (void)setEdit:(BOOL)isEdit{
     
     
-    if ([DBUtils isHasStatusDownloading] || isVerify) {
+    if (isVerify) {
         return;
     }
     
@@ -657,11 +669,19 @@
         BookCellView *cell =(BookCellView *)[self.gridView.bookCellDic objectForKey:key];
         
         if ([cell.type isEqualToString:TYPE_CELL_BOOK]) {
+            
+            //取消所有下载中的手册
+            if ([cell isDownloading] && isEdit) {
+                
+                [DBUtils updateBookStatus:STATUS_downloading_suspend downnum:[cell downnum]];
+                [cell cancelDownload];
+            }
+            
             [cell showDeleteBtn:isEdit];
             
             self.gridView.edit =isEdit;
         }
-       
+        
     }
 }
 
@@ -931,7 +951,7 @@
     if (!str || str.length==0) {
         return @"";
     }
-    if (0 < str.length < 10) {
+    if (str.length < 10) {
         
         if (isPushVerify) {
             
@@ -1038,22 +1058,26 @@
 //处理验证下载码结果
 - (void)handleCheckInfo:(ASIHTTPRequest *) request{
     
-    NSArray *datas = [(NSDictionary *)[[request responseData] objectFromJSONData]
-                          objectForKey:@"handbookMsgs"];
-    NSString *httpHeader =[(NSDictionary *)[[request responseData] objectFromJSONData] objectForKey:@"httpImage"];
+    NSDictionary *responseData = [(NSDictionary *)[[request responseData] objectFromJSONData]
+                                  objectForKey:@"bookInfoResponse"];
+    
+    NSString *httpHeader =[responseData objectForKey:@"httpImage"];
     //更新httpHeader
     [[HttpHeader shareInstance] updateHttpHeader:httpHeader];
     
-    
+    NSArray *datas =[responseData objectForKey:@"list"];
     
     for (NSDictionary *data in datas) {
         
         
         Book *b =[DBUtils queryBookByDownnum:[data objectForKey:@"downnum"]];
         
+        
         if (b == nil) {
             continue;
         }
+        
+        
         
         if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
             
@@ -1085,16 +1109,20 @@
         }
         
         BOOL result =[DBUtils updateBook:b];
+        
+        CCLog(@"---更新数据");
+        
         if (result) {
             
             [self updateBookCell:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
             
-            [self addDownloadOperationByBook:b index:[self.gridView getIndexByDownnum:b.downnum]];
+            [self addDownloadTempArray:b index:[self.gridView getIndexByDownnum:b.downnum]];
         }
         
     }
     
 }
+
 
 
 - (void)toBookView:(Book *)book{
@@ -1185,33 +1213,63 @@
     isVerify =NO;
 }
 
-//添加下载队列
--(void)addDownloadOperationByBook:(Book *)book index:(NSUInteger)index{
-    
-    if (!downloadQueue) {
-        downloadQueue =[[NSOperationQueue alloc] init];
-        [downloadQueue setMaxConcurrentOperationCount:1];
-    }
-    
-    if (!operationArray) {
-        
-        operationArray =[[NSMutableArray alloc] init];
-    }
-    
-    if ([operationArray containsObject:[book downnum]] || [self isHasBookLocation:book]) {
-        return;
-    }
+- (void)addDownloadTempArray:(Book *)book index:(NSUInteger)index{
     
     NSMutableDictionary *bookDic =[[NSMutableDictionary alloc] init];
     [bookDic setObject:book forKey:@"book"];
     [bookDic setObject:[NSNumber numberWithInt:index] forKey:@"index"];
     
-    NSInvocationOperation *operation =[[NSInvocationOperation alloc] initWithTarget:self
-                                                                           selector:@selector(checkNetWorkToDownload:)
-                                                                             object:bookDic];
-    [operationArray addObject:[book downnum]];
+    if (!downloadTempArray) {
+        
+        downloadTempArray =[[NSMutableArray alloc] init];
+    }
     
-    [downloadQueue addOperation:operation];
+    for(NSDictionary *temDic in downloadTempArray){
+        
+        Book *book2 =[temDic objectForKey:@"book"];
+        
+        if ([book2.downnum isEqualToString:book.downnum]) {
+            
+            if (![DBUtils isHasStatusDownloading]) {
+                
+                [self addOperationArray];
+            }
+            return;
+        }
+    }
+    
+    [downloadTempArray addObject:bookDic];
+    
+    [self addOperationArray];
+}
+
+- (void)addOperationArray{
+    
+    if (!operationArray) {
+        operationArray =[[NSMutableArray alloc] init];
+    }
+    
+    if ([operationArray count] !=0) {
+        
+        return;
+    }
+    
+    
+    if (downloadTempArray && [downloadTempArray count] >0) {
+        
+        NSDictionary *dic =[downloadTempArray objectAtIndex:0];
+        
+        [operationArray addObject:dic];
+        
+        [downloadTempArray removeObjectAtIndex:0];
+    }
+    
+    if (operationArray && [operationArray count] >0) {
+        
+        NSDictionary *dic =[operationArray objectAtIndex:0];
+        
+        [self checkNetWorkToDownload:[dic mutableCopy]];
+    }
 }
 
 

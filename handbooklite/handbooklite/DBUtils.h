@@ -51,4 +51,10 @@
 
 + (NSUInteger)queryCountOfPushMsgByDownnum:(NSString *)downnum;
 
+//---------------------------用于导出旧数据---------------------------------
+
++ (NSMutableArray *)queryAllBkBooks;
+
++ (NSMutableArray *)queryAllBkTempBooks;
+
 @end

@@ -6,9 +6,9 @@
 //
 //
 
-@class FMDatabase;
-
 #import <Foundation/Foundation.h>
+#import "FMDatabase.h"
+#import "Config.h"
 
 @interface WSYDDatabase : NSObject{
     

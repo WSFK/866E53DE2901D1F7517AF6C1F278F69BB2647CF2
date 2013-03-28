@@ -29,6 +29,7 @@
 
 @synthesize pushBtn =_pushBtn;
 @synthesize iconNewImgView =_iconNewImgView;
+@synthesize isDownloading;
 
 
 - (void)dealloc{
@@ -155,12 +156,8 @@
                                                        cellH:cellFrame.size.height
                                                cellBackFrame:backFrame];
   
-  cell.deleteBtn.frame = [self initDeleteBtnWithImgW:iconImage.size.width
-                                                imgH:iconImage.size.height
-                                               cellW:cellFrame.size.width
-                                               cellH:cellFrame.size.height
-                                               cellX:cellFrame.origin.x
-                                               cellY:cellFrame.origin.y];
+    cell.deleteBtn.frame = [self initDeleteBtnWithCellX:cell.bookIconView.frame.origin.x
+                                                  cellY:cell.bookIconView.frame.origin.y];
   
   
   cell.suspendView.frame =[self initSuspendViewFrameWithImgW:iconImage.size.width
@@ -175,12 +172,10 @@
                                                   cellH:cellFrame.size.height
                                           cellBackFrame:backFrame];
   
-  cell.pushBtn.frame =[self initPushBtnWithImgW:iconImage.size.width
-                                           imgH:iconImage.size.height
-                                          cellW:cellFrame.size.width
-                                          cellH:cellFrame.size.height
-                                          cellX:cellFrame.origin.x
-                                          cellY:cellFrame.origin.y];
+    cell.pushBtn.frame =[self initPushBtnWithCellW:cell.bookIconView.frame.size.width
+                                             cellH:cell.bookIconView.frame.size.height
+                                             cellX:cell.bookIconView.frame.origin.x
+                                             cellY:cell.bookIconView.frame.origin.y];
   
   cell.iconNewImgView.frame =[self initNewViewFrameWithImgW:iconImage.size.width
                                                        imgH:iconImage.size.height
@@ -235,25 +230,12 @@
 }
 
 //获取删除按钮位置 Frame
-- (CGRect)initDeleteBtnWithImgW:(double)iw imgH:(double)ih cellW:(double)cw cellH:(double)ch cellX:(CGFloat)x cellY:(CGFloat)y{
-  
-  if (iw >ih) {
-    double nifh = ch * ih / iw;
-    double difh = ch - nifh;
-    //return CGRectMake(x+cw-21,y + difh-21,42, 42);
-    return CGRectMake(x-20,y + difh-21,42, 42);
+- (CGRect)initDeleteBtnWithCellX:(CGFloat)x cellY:(CGFloat)y{
     
-  }else{
-    
-    //double nifw = cw * iw / ih;
-    //double difw = cw - nifw;
-    
-    //return CGRectMake((x + difw / 2 + cw- difw -21),y-21,42, 42);
-    return CGRectMake(x-1,y-21,42, 42);
-  }
+    return CGRectMake(x-21,y-21,42, 42);
 }
 
-//获取下载按钮位置 Frame
+//获取暂停图标位置 Frame
 - (CGRect)initSuspendViewFrameWithImgW:(double)iw imgH:(double)ih cellW:(double)cw cellH:(double)ch cellBackFrame:(CGRect)frame{
   
   if (iw >ih) {
@@ -270,32 +252,21 @@
 //获取下载中lable Frame
 - (CGRect)initDlingLableFrameWithImgW:(double)iw imgH:(double)ih cellW:(double)cw cellH:(double)ch cellBackFrame:(CGRect)frame{
   
-  if (iw >ih) {
-    double nifh = ch * ih / iw;
-    double difh = ch - nifh;
-    return CGRectMake((frame.size.width/2-25)  , (frame.origin.y + difh)-20, 50, 15);
-    
-  }else{
-    
-    return CGRectMake((frame.size.width/2-25) , frame.origin.y-20, 50, 15);
-  }
+    if (iw >ih) {
+        double nifh = ch * ih / iw;
+        double difh = ch - nifh;
+        return CGRectMake((frame.size.width/2-25)  , (frame.origin.y + difh)-15, 50, 15);
+        
+    }else{
+        
+        return CGRectMake((frame.size.width/2-25) , frame.origin.y-15, 50, 15);
+    }
 }
 
 //获取推送数字按钮位置 Frame
-- (CGRect)initPushBtnWithImgW:(double)iw imgH:(double)ih cellW:(double)cw cellH:(double)ch cellX:(CGFloat)x cellY:(CGFloat)y{
-  
-  if (iw >ih) {
-    double nifh = ch * ih / iw;
-    double difh = ch - nifh;
-    return CGRectMake(x+cw-18,y + difh-18,30, 31);
+- (CGRect)initPushBtnWithCellW:(double)cw cellH:(double)ch cellX:(CGFloat)x cellY:(CGFloat)y{
     
-  }else{
-    
-    double nifw = cw * iw / ih;
-    double difw = cw - nifw;
-    
-    return CGRectMake((x + difw / 2 + cw- difw -18),y-18,30, 31);
-  }
+    return CGRectMake(x+cw-14,y -14,30, 31);
 }
 
 //获取当前手册的newView  Frame
@@ -324,6 +295,8 @@
   [self.lbdling setText:@"下载中..."];
   [self.suspendView setHidden:YES];
   [self initNetworkQueueByProgress];
+    
+    isDownloading =YES;
   
   NSString *httpHeader = [[HttpHeader shareInstance] httpHeader];
   
@@ -453,23 +426,43 @@
 
 //下载失败
 - (void)didDownloadFailed:(ASIHTTPRequest *)request{
-  
-  CCLog(@"download  failed:%@",request.error);
-  
-  if (!isCancel) {
-    SEL downloadFinishedSelector = @selector(cellWasDownloadFinished:error:);
-    if ([gridView respondsToSelector:downloadFinishedSelector]) {
-      [gridView performSelector:downloadFinishedSelector withObject:self withObject:@"failed"];
+    
+    CCLog(@"download  failed:%@",request.error);
+    
+    NSDictionary *userinfo =[request userInfo];
+    
+    if ([@"download_zip" isEqualToString:[userinfo objectForKey:@"name"]]) {
+        
+        isDownloading =NO;
+        
+        SEL downloadFinishedSelector = @selector(cellWasDownloadFinished:error:);
+        
+        NSString *error =@"";
+        if (!isCancel) {
+            
+            error =@"failed";
+            //更新图标
+            [self reloadBookIcon:self iconImage:[UIImage imageNamed:@"code_error.png"]];
+            
+            [self endProgress];
+            [self.lbdling setHidden:YES];
+            [self.suspendView setHidden:YES];
+            [self.iconNewImgView setHidden:YES];
+            [self.backgroundView setBackgroundColor:[UIColor clearColor]];
+        }else{
+            
+            error =@"cancel";
+            
+            [self endProgress];
+            [self.lbdling setHidden:YES];
+            [self.suspendView setHidden:NO];
+            [self.iconNewImgView setHidden:NO];
+        }
+        if ([gridView respondsToSelector:downloadFinishedSelector]) {
+            [gridView performSelector:downloadFinishedSelector withObject:self withObject:error];
+        }
     }
     
-    [self endProgress];
-    [self.lbdling setHidden:YES];
-    [self.suspendView setHidden:YES];
-    [self.iconNewImgView setHidden:YES];
-    
-    //更新图标
-    [self reloadBookIcon:self iconImage:[UIImage imageNamed:@"code_error.png"]];
-  }
 }
 //下载成功
 - (void)didDownloadFinished:(ASIHTTPRequest *)request{
@@ -488,6 +481,8 @@
       [fm copyItemAtPath:request.downloadDestinationPath toPath:iconSavePath error:nil];
       
       [self reloadBookIcon:self iconImage:[UIImage imageWithContentsOfFile:request.downloadDestinationPath]];
+        
+        self.backgroundView.backgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha:0.1];
       
       [self.iconNewImgView setHidden:NO];
       
@@ -529,6 +524,8 @@
     }
     
     [self finishedView];
+      
+      isDownloading =NO;
     
   }
 }
@@ -579,23 +576,46 @@
 }
 
 - (void)showPushNumber:(NSUInteger)number{
-  
-  
-  BOOL isShow =NO;
-  
-  if (number >0) {
     
-    [self.pushBtn setTitle:[NSString stringWithFormat:@"%i",number] forState:UIControlStateNormal];
-    isShow =YES;
     
-  }else{
-    isShow =NO;
+    if (![self isHasBookLocation:downnum]) {
+        
+        return;
+    }
     
-  }
-  
-  [self.pushBtn setHidden:!isShow];
-  [self.pushBtn setEnabled:isShow];
-  
+    BOOL isShow =NO;
+    
+    if (number >0) {
+        
+        [self.pushBtn setTitle:[NSString stringWithFormat:@"%i",number] forState:UIControlStateNormal];
+        isShow =YES;
+        
+    }else{
+        isShow =NO;
+        
+    }
+    
+    [self.pushBtn setHidden:!isShow];
+    [self.pushBtn setEnabled:isShow];
+    
+}
+
+//判断本地手册是否存在
+- (BOOL)isHasBookLocation:(NSString *)downnumber{
+    
+    
+    NSString *cacheBookPath =[CACHE_PATH stringByAppendingPathComponent:@"books"];
+    
+    NSString *bookDocPath = [cacheBookPath stringByAppendingPathComponent:downnumber];
+    
+    NSFileManager *fm =[NSFileManager defaultManager];
+    
+    if ([fm fileExistsAtPath:bookDocPath] &&
+        [fm fileExistsAtPath:[bookDocPath stringByAppendingPathComponent:@"book.json"]])
+    {
+        return YES;
+    }
+    return NO;
 }
 
 

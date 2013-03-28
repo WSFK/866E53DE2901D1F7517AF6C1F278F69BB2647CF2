@@ -32,6 +32,7 @@
   NSString *downnum;
   
   BOOL isCancel;
+    BOOL isDownloading;
   
   
   ASINetworkQueue *_networkQueue;
@@ -53,6 +54,8 @@
 
 @property (nonatomic ,strong) ASINetworkQueue *networkQueue;
 @property (nonatomic ,strong) BookShelfViewController *bookTarget;
+
+@property (nonatomic ,assign) BOOL isDownloading;
 
 - (id)initWithFrame:(CGRect)frame andIndex:(NSUInteger)atIndex;
 

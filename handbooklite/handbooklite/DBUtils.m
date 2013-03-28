@@ -8,6 +8,7 @@
 
 #import "DBUtils.h"
 #import "WSYDDatabase.h"
+#import "WSYDBKDatabase.h"
 #import "FMDatabase.h"
 
 @implementation DBUtils
@@ -218,7 +219,12 @@
   
   FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
   
-  FMResultSet *res =[db executeQuery:@"select * from t_book where status =?",STATUS_already_enter_code];
+    FMResultSet *res =[db executeQuery:@"select * from t_book where status in(?,?,?,?,?)",
+                       STATUS_already_enter_code,
+                       STATUS_already_enter_code_not_found,
+                       STATUS_already_enter_code_not_share,
+                       STATUS_already_enter_code_out_date,
+                       STATUS_already_enter_code_suspend];
   
   NSMutableArray *books = [[NSMutableArray alloc] init];
   while ([res next]) {
@@ -352,5 +358,53 @@
   
   return count;
 }
+
+//--------------------------------导出旧数据操作------------------------------------------
+
++ (NSMutableArray *)queryAllBkBooks{
+    
+    FMDatabase *db = [WSYDBKDatabase newInstance].fmdatabse;
+    
+    FMResultSet *res =[db executeQuery:@"SELECT * FROM t_book order by id"];
+    
+    NSMutableArray *books = [[NSMutableArray alloc] init];
+    while ([res next]) {
+        
+        Book *book = [[Book alloc] init];
+        [book setID:[res intForColumn:@"id"]];
+        [book setName:[res stringForColumn:@"name"]];
+        [book setDownnum:[res stringForColumn:@"downnum"]];
+        [book setDir:[res stringForColumn:@"dir"]];
+        [book setZip:[res stringForColumn:@"zip"]];
+        [book setIcon:[res stringForColumn:@"icon"]];
+        [book setBookId:[res stringForColumn:@"bookid"]];
+        
+        [books addObject:book];
+    }
+    
+    [[WSYDBKDatabase newInstance] closeDb];
+    return books;
+}
+
++ (NSMutableArray *)queryAllBkTempBooks{
+    
+    FMDatabase *db = [WSYDBKDatabase newInstance].fmdatabse;
+    
+    FMResultSet *res =[db executeQuery:@"SELECT * FROM t_temp order by id"];
+    
+    NSMutableArray *books = [[NSMutableArray alloc] init];
+    while ([res next]) {
+        
+        Book *book = [[Book alloc] init];
+        [book setID:[res intForColumn:@"id"]];
+        [book setDownnum:[res stringForColumn:@"downnum"]];
+        
+        [books addObject:book];
+    }
+    
+    [[WSYDBKDatabase newInstance] closeDb];
+    return books;
+}
+
 
 @end

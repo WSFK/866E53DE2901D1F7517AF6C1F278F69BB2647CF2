@@ -7,8 +7,6 @@
 //
 
 #import "WSYDDatabase.h"
-#import "FMDatabase.h"
-#import "Config.h"
 
 @implementation WSYDDatabase
 

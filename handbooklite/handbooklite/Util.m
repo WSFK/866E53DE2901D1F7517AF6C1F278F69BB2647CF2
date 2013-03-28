@@ -24,15 +24,15 @@
 }
 
 +(UIImage *) getShareTwoCode:(NSString *) currentBookDownNum{
-  NSMutableString *shareUrl = [[NSMutableString alloc] init];
-  [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
-  [shareUrl appendFormat:@"?su=%@",USERUUID];          //参数：分享者id
-  [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
-  [shareUrl appendFormat:@"&downloadnum=%@",currentBookDownNum];          //参数：下载码
-  [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];          //参数：hash
-  
-  UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
-  return twImage;
+    NSMutableString *shareUrl = [[NSMutableString alloc] init];
+    [shareUrl appendString:DOWNLOAD_URL]; //下载接口地址
+    [shareUrl appendFormat:@"?downloadnum=%@",currentBookDownNum];  //参数：下载码
+    [shareUrl appendFormat:@"&su=%@",USERUUID];                     //参数：分享者id
+    [shareUrl appendFormat:@"&st=%@",[Util getDayString]];          //参数：分享时间
+    [shareUrl appendFormat:@"&hash=%d",[shareUrl hash]];            //参数：hash
+    
+    UIImage *twImage = [QRCodeGenerator qrImageForString:shareUrl imageSize:139];
+    return twImage;
 }
 
 +(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId{

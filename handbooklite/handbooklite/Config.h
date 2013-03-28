@@ -15,7 +15,8 @@
 #define LIBRARY_PATH [PathUtils libraryPath]
 #define TMP_PATH [PathUtils tempPath]
 
-#define DB_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db.sqlite3"]
+#define DB_OLD_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db.sqlite3"]
+#define DB_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db_v3.sqlite3"]
 
 #define BASE_URL @"http://192.168.1.102:8085/"
 //#define BASE_URL @"http://ms.thoughtfactory.com.cn/"
