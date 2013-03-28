@@ -243,6 +243,7 @@
     
     PushMsgAlert *alert =[[PushMsgAlert alloc] initWithTitle:@"四维册推送"
                                                      message:msg
+                                                    delegate:self
                                            cancelButtonTitle:@"取  消"
                                            otherButtonTitles:@"确  定", nil];
     [alert setTag:ALERT_PUSH_DOWNLOAD];
