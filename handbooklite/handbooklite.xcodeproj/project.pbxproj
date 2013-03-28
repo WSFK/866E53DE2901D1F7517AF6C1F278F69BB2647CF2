@@ -166,6 +166,7 @@
 		E2E5F8281676E11C00F056AB /* downloadlist.png in Resources */ = {isa = PBXBuildFile; fileRef = E2E5F8261676E11C00F056AB /* downloadlist.png */; };
 		E2E5F8291676E11C00F056AB /* downloadlist@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2E5F8271676E11C00F056AB /* downloadlist@2x.png */; };
 		E2E5F83316772BFA00F056AB /* HttpHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E2E5F83216772BFA00F056AB /* HttpHeader.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		E2E68E0B1703E134007A323A /* WSYDBKDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = E2E68E0A1703E134007A323A /* WSYDBKDatabase.m */; };
 		E2E72FF216F717A1006EC987 /* suspend.png in Resources */ = {isa = PBXBuildFile; fileRef = E2E72FEC16F717A1006EC987 /* suspend.png */; };
 		E2E72FF316F717A1006EC987 /* suspend@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2E72FED16F717A1006EC987 /* suspend@2x.png */; };
 		E2E72FF416F717A1006EC987 /* new.png in Resources */ = {isa = PBXBuildFile; fileRef = E2E72FEE16F717A1006EC987 /* new.png */; };
@@ -462,6 +463,8 @@
 		E2E5F8271676E11C00F056AB /* downloadlist@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "downloadlist@2x.png"; sourceTree = "<group>"; };
 		E2E5F83116772BF900F056AB /* HttpHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HttpHeader.h; sourceTree = "<group>"; };
 		E2E5F83216772BFA00F056AB /* HttpHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HttpHeader.m; sourceTree = "<group>"; };
+		E2E68E091703E134007A323A /* WSYDBKDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSYDBKDatabase.h; sourceTree = "<group>"; };
+		E2E68E0A1703E134007A323A /* WSYDBKDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WSYDBKDatabase.m; sourceTree = "<group>"; };
 		E2E72FEC16F717A1006EC987 /* suspend.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = suspend.png; sourceTree = "<group>"; };
 		E2E72FED16F717A1006EC987 /* suspend@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "suspend@2x.png"; sourceTree = "<group>"; };
 		E2E72FEE16F717A1006EC987 /* new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new.png; sourceTree = "<group>"; };
@@ -985,6 +988,8 @@
 		E28341681675B510000918B4 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				E2E68E091703E134007A323A /* WSYDBKDatabase.h */,
+				E2E68E0A1703E134007A323A /* WSYDBKDatabase.m */,
 				E28341691675B582000918B4 /* WSYDDatabase.h */,
 				E283416A1675B582000918B4 /* WSYDDatabase.m */,
 				E283416F1675C3E4000918B4 /* DBUtils.h */,
@@ -1333,6 +1338,7 @@
 				1569428116F9BADE007E30F0 /* UINavigationController+Rotation_IOS6.m in Sources */,
 				1569428A16F9C54E007E30F0 /* PushMsg.m in Sources */,
 				1569428F16F9C577007E30F0 /* PushMsgAlert.m in Sources */,
+				E2E68E0B1703E134007A323A /* WSYDBKDatabase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
