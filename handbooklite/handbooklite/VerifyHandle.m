@@ -18,13 +18,13 @@
 @synthesize requestForm;
 
 
-- (void)startVerify{
+- (void)startVerifyWithDownnum:(NSString *)downum verifyType:(NSString *)type{
     
     NSMutableArray *books =nil;
     
-    if ([delegate respondsToSelector:@selector(verifyDataSource:)]) {
+    if ([delegate respondsToSelector:@selector(verifyDataSource:downnum:verifyType:)]) {
         
-        books =[delegate verifyDataSource:self];
+        books =[delegate verifyDataSource:self downnum:downum verifyType:type];
     }
     
     if ([books count] >0) {

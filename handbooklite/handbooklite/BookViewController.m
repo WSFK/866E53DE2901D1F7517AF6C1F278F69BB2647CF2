@@ -1425,6 +1425,16 @@ __VA_ARGS__ \
     }
 	}
 }
+
+- (BOOL)shouldAutorotate
+{
+    return YES;
+}
+-(NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscape;
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	// Overriden to allow any orientation.
   CCLog(@"----------availableOrientation:%@",availableOrientation);

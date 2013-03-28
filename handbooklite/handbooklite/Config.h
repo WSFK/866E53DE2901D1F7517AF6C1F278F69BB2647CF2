@@ -22,7 +22,7 @@
 //#define BASE_URL @"http://ms.thoughtfactory.com.cn/"
 //#define BASE_URL [[[UIDevice currentDevice] model] isEqualToString:@"iPad Simulator"]?@"http://192.168.1.100:8085/":@"http://ms.thoughtfactory.com.cn/"
 
-#define VERIFY_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_bookInfo"]
+#define VERIFY_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_bookInfov3"]
 #define DOWNLOAD_URL [NSString stringWithFormat:@"%@%@",BASE_URL,@"client/interface_qxz"]
 
 //日志提交接口

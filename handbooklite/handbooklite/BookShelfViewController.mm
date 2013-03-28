@@ -277,7 +277,7 @@
 - (void)didComfirm{
     
     //添加帮助手册
-    [self openBookByURL:[self saxReader:HELP_DOWNNUM isPushVerify:NO]];
+    [self openBookByURL:[self saxReader:HELP_DOWNNUM codeType:CODE_TYPE_INPUT]];
     
     NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
     [defaults setObject:@"YES" forKey:@"prompt"];
@@ -342,6 +342,15 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
 	return [self orientationByString:ORIENTATION InterfaceOrientation:interfaceOrientation];
+}
+
+- (BOOL)shouldAutorotate
+{
+    return YES;
+}
+-(NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscape;
 }
 
 //列表显示的个数  包括空位
@@ -576,7 +585,7 @@
             if (![NetWorkCheck checkReachable]) {
                 return;
             }
-            [self startVerifyHandle];
+            [self startVerifyHandleWithDownnum:book.downnum verifyType:VERIFY_TYPE_SIMPLE];
             
         }
         
@@ -789,7 +798,7 @@
 #pragma -mark DownloadAlertViewDelegate
 - (void)commitWithText:(NSString *)text{
     
-    [self openBookByURL:[self saxReader:text isPushVerify:NO]];
+    [self openBookByURL:[self saxReader:text codeType:CODE_TYPE_INPUT]];
     
 }
 
@@ -826,7 +835,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"TWOCODEWITHRRESULT" object:nil];
     tc.isSendTwoCodeNoti = NO;
     NSString *result = [notifi object];
-    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result isPushVerify:NO] afterDelay:1.0];
+    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result codeType:CODE_TYPE_PHOTO] afterDelay:1.0];
   }
   
 }
@@ -847,7 +856,7 @@
       
       NSString *pushDownnum =[alert pushDownnum];
       
-      [self openBookByURL:[self saxReader:pushDownnum isPushVerify:YES]];
+      [self openBookByURL:[self saxReader:pushDownnum codeType:CODE_TYPE_PUSH]];
     }
   }
   
@@ -942,31 +951,46 @@
 
 
 //重构二维码内容
-- (NSString *)saxReader:(NSString *)str isPushVerify:(BOOL)isPushVerify{
+- (NSString *)saxReader:(NSString *)str codeType:(NSString *)codeType{
     /**
      例子：http://ms.thoughtfactory.com.cn/client/interface_qxz?downloadnum=TFFLHELP&su=123&st=20130305122323&hash=5
+     
+     v2.0.2：https://itunes.apple.com/us/app/si-wei-ce-yue-du/id573415099?mt=8&downnum=1002&name=冷山学具
      
      重构后：wsydlite://www.wsyd.com?downloadnum=TFFLHELP&su=123&st=20130305122323&hash=5
      */
     
+    
     if (!str || str.length==0) {
         return @"";
     }
-    if (str.length < 10) {
+    
+    if ([codeType isEqualToString:CODE_TYPE_INPUT]) {
         
-        if (isPushVerify) {
-            
-            NSString *param =[NSString stringWithFormat:@"downloadnum=%@&su=push&st=%@",str,[Util getDayString]];
-            
-            return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?%@&hash=%i",param,[param hash]];
-        }
         return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?downloadnum=%@&su=0&st=0&hash=0",str];
+    }
+    
+    if ([codeType isEqualToString:CODE_TYPE_PUSH]) {
+        
+        NSString *param =[NSString stringWithFormat:@"downloadnum=%@&su=push&st=%@",str,[Util getDayString]];
+        
+        return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?%@&hash=%i",param,[param hash]];
+    }
+    
+    if ([codeType isEqualToString:CODE_TYPE_PHOTO]) {
+        
+        if ([str rangeOfString:@"?"].location !=NSNotFound && [str rangeOfString:@"?"].location >0) {
+            
+            return [str stringByReplacingOccurrencesOfString:
+                    [str substringToIndex:[str rangeOfString:@"?"].location]
+                                                  withString:@"wsydlite://www.wsyd.com"];
+        }
+        
+        return @"null";
         
     }
     
-    return [str stringByReplacingOccurrencesOfString:
-            [str substringToIndex:[str rangeOfString:@"?"].location]
-                                          withString:@"wsydlite://www.wsyd.com"];
+    return @"";
 }
 
 - (void)openOrAddBook:(NSNotification *)noti{
@@ -980,36 +1004,47 @@
 - (void)openBookByURL:(NSString *)urlString{
     /**
      url:wsydlite://www.wsyd.com?downloadnum=%@&su=&st=&hash=
+     
+     wsydlite://www.wsyd.com?mt=8&downnum=1002&name=冷山学具
      */
-
-    NSUInteger p1 =[urlString rangeOfString:@"?downloadnum="].location;
-    NSUInteger p2 =[urlString rangeOfString:@"&su="].location;
-    NSUInteger p3 =[urlString rangeOfString:@"&st="].location;
-    NSUInteger p4 =[urlString rangeOfString:@"hash="].location;
     
-    if ([urlString isEqualToString:@""] ||
-        (p1 ==NSNotFound ||
-         p2 ==NSNotFound ||
-         p3 ==NSNotFound ||
-         p4 ==NSNotFound))
-    {
-        CCLog(@"URL resutlt is null");
-        //TODO 添加提示
-        [self showMessage:@"该二维码无法进行下载!"];
+    if ([urlString isEqualToString:@""]) {
         return;
     }
-    NSString *temp =[urlString substringFromIndex:([urlString rangeOfString:@"downloadnum="].location+[@"downloadnum=" length])];
-    NSString *downnum =[temp substringToIndex:[temp rangeOfString:@"&"].location];
     
-    temp =[urlString substringFromIndex:([urlString rangeOfString:@"su="].location+[@"su=" length])];
-    NSString *su =[temp substringToIndex:[temp rangeOfString:@"&"].location];
+    if ([urlString isEqualToString:@"null"]) {
+        
+        [self showMessage:@"该二维码不能下载手册"];
+        return;
+    }
     
-    temp =[urlString substringFromIndex:([urlString rangeOfString:@"st="].location+[@"st=" length])];
-    NSString *st =[temp substringToIndex:[temp rangeOfString:@"&"].location];
+    NSString *temp =[[NSURL URLWithString:urlString] query];
     
-    NSString *hash =[urlString substringFromIndex:([urlString rangeOfString:@"hash="].location+[@"hash=" length])];
+    NSArray *temps =[temp componentsSeparatedByString:@"&"];
     
-    CCLog(@"su:%@--st:%@--hash:%@",su,st,hash);
+    NSMutableDictionary *kvsDic = [[NSMutableDictionary alloc] init];
+    if ([temps count] > 0) {
+        
+        for (NSString *kv in temps) {
+            
+            NSArray *kvs =[kv componentsSeparatedByString:@"="];
+            if ([kvs count] > 1) {
+                
+                [kvsDic setObject:[kvs objectAtIndex:1] forKey:[kvs objectAtIndex:0]];
+            }
+        }
+    }
+    
+    NSString *downnum =[kvsDic objectForKey:@"downloadnum"] ==nil?
+    [kvsDic objectForKey:@"downnum"] ==nil?@"":[kvsDic objectForKey:@"downnum"]:
+    [kvsDic objectForKey:@"downloadnum"];
+    
+    NSString *su =[kvsDic objectForKey:@"su"] ==nil?@"0":[kvsDic objectForKey:@"su"];
+    
+    NSString *st =[kvsDic objectForKey:@"st"] ==nil?@"0":[kvsDic objectForKey:@"st"];
+    
+    NSString *hash =[kvsDic objectForKey:@"hash"] ==nil?@"0":[kvsDic objectForKey:@"hash"];
+    
     
     Book *book =[DBUtils queryBookByDownnum:downnum];
     
@@ -1033,11 +1068,11 @@
             //添加手册
             [self addBookCell:bk];
             
-        }   
+        }
         
         if ([NetWorkCheck checkReachable] && result) {
             //有网络  发送验证下载码
-            [self startVerifyHandle];
+            [self startVerifyHandleWithDownnum:bk.downnum verifyType:VERIFY_TYPE_SIMPLE];
         }
         return;
     }else{
@@ -1052,7 +1087,7 @@
 - (void)didBookListVerify:(NSNotification *)noti{
     
     CCLog(@"开始执行列表检查......");
-    [self startVerifyHandle];
+    [self startVerifyHandleWithDownnum:nil verifyType:VERIFY_TYPE_MORE];
 }
 
 
@@ -1096,17 +1131,14 @@
         else if([@"not_found" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_not_found];
-            [self showMessage:@"该手册没找到"];
         }
         else if([@"not_share" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_not_share];
-            [self showMessage:@"该手册尚未发布"];
         }
         else if([@"out_date" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_out_date];
-            [self showMessage:@"该手册已过期"];
         }
         
         BOOL result =[DBUtils updateBook:b];
@@ -1117,7 +1149,10 @@
             
             [self updateBookCell:b atIndex:[self.gridView getIndexByDownnum:b.downnum]];
             
-            [self addDownloadTempArray:b index:[self.gridView getIndexByDownnum:b.downnum]];
+            if([STATUS_downloading_waitting isEqualToString:b.status]){
+                
+                [self addDownloadTempArray:b index:[self.gridView getIndexByDownnum:b.downnum]];
+            }
         }
         
     }
@@ -1180,7 +1215,7 @@
 }
 
 //启动验证机制
-- (void)startVerifyHandle{
+- (void)startVerifyHandleWithDownnum:(NSString *)downum verifyType:(NSString *)verifyType{
     
     if (!verifyHandle) {
         verifyHandle =[[VerifyHandle alloc] init];
@@ -1188,16 +1223,29 @@
     }
     
     if (![verifyHandle isAction]) {
-        [verifyHandle startVerify];
+        [verifyHandle startVerifyWithDownnum:downum verifyType:verifyType];
     }
     
     isVerify =[verifyHandle isAction];
 }
 
 #pragma -mark VerifyHandleDelegate
-- (NSMutableArray *)verifyDataSource:(VerifyHandle *)verifyHandle{
+- (NSMutableArray *)verifyDataSource:(VerifyHandle *)verifyHandle downnum:(NSString *)downnum verifyType:(NSString *)verifyType{
     
-    return [DBUtils queryAllBookNotVerify];
+    if ([verifyType isEqualToString:VERIFY_TYPE_MORE]) {
+        
+        return [DBUtils queryAllBookNotVerify];
+    }
+    
+    if ([verifyType isEqualToString:VERIFY_TYPE_SIMPLE]) {
+        
+        NSMutableArray *books =[[NSMutableArray alloc] init];
+        Book *book =[DBUtils queryBookByDownnum:downnum];
+        [books addObject:book];
+        return books;
+    }
+    return nil;
+    
 }
 #pragma -mark VerifyHandleDelegate
 - (void)verifyFinished:(VerifyHandle *)verifyHandle request:(ASIHTTPRequest *)request{

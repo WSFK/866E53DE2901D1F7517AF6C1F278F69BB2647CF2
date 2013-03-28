@@ -21,6 +21,10 @@
 #import "VerifyHandle.h"
 #import "TwoCapture.h"
 
+#define CODE_TYPE_INPUT @"code_type_input"
+#define CODE_TYPE_PHOTO @"code_type_photo"
+#define CODE_TYPE_PUSH  @"code_type_push"
+
 @interface BookShelfViewController : UIViewController
 <ASIHTTPRequestDelegate,
 MMGridViewDelegate,
@@ -120,7 +124,7 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 - (IBAction)clickEditSelector:(id)sender;
 
 //重构二维码
-- (NSString *)saxReader:(NSString *)str isPushVerify:(BOOL)isPushVerify;
+- (NSString *)saxReader:(NSString *)str codeType:(NSString *)codeType;
 
 //通过URL打开手册
 - (void)openBookByURL:(NSString *)urlString;

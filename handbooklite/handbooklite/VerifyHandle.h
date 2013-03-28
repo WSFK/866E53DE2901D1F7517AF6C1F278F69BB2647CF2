@@ -12,12 +12,15 @@
 #import "ASIFormDataRequest.h"
 #import "Book.h"
 
+#define VERIFY_TYPE_SIMPLE @"verify_type_simple"
+#define VERIFY_TYPE_MORE   @"verify_type_more"
+
 @class VerifyHandle;
 
 @protocol VerifyHandleDelegate <NSObject>
 
 @required
-- (NSMutableArray *)verifyDataSource:(VerifyHandle *)verifyHandle;
+- (NSMutableArray *)verifyDataSource:(VerifyHandle *)verifyHandle downnum:(NSString *)downnum verifyType:(NSString *)verifyType;
 
 - (void)verifyFinished:(VerifyHandle *)verifyHandle request:(ASIHTTPRequest *)request;
 
@@ -38,6 +41,6 @@
 @property (nonatomic, strong) ASIFormDataRequest *requestForm;
 @property (nonatomic, assign) BOOL isAction;
 
-- (void)startVerify;//启动机制
+- (void)startVerifyWithDownnum:(NSString *)downum verifyType:(NSString *)type;//启动机制
 
 @end

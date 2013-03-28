@@ -64,6 +64,15 @@
 	return [self orientationByString:ORIENTATION InterfaceOrientation:interfaceOrientation];
 }
 
+- (BOOL)shouldAutorotate
+{
+    return YES;
+}
+-(NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscape;
+}
+
 - (void)clickCleanScreen:(id)sender{
     [paintView cleanScreen];
 }

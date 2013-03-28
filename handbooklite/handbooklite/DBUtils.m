@@ -219,12 +219,7 @@
   
   FMDatabase *db = [WSYDDatabase newInstance].fmdatabse;
   
-    FMResultSet *res =[db executeQuery:@"select * from t_book where status in(?,?,?,?,?)",
-                       STATUS_already_enter_code,
-                       STATUS_already_enter_code_not_found,
-                       STATUS_already_enter_code_not_share,
-                       STATUS_already_enter_code_out_date,
-                       STATUS_already_enter_code_suspend];
+    FMResultSet *res =[db executeQuery:@"select * from t_book where status =?",STATUS_already_enter_code];
   
   NSMutableArray *books = [[NSMutableArray alloc] init];
   while ([res next]) {
