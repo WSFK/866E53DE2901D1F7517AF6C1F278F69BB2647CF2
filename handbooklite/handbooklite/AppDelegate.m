@@ -234,14 +234,83 @@
     NSString *books_cache_path =[CACHE_PATH stringByAppendingPathComponent:@"books"];
     
     if (![fm fileExistsAtPath:books_cache_path]) {
-        BOOL result =[fm copyItemAtPath:books_resource_path toPath:books_cache_path error:nil];
+        BOOL result =[fm copyItemAtPath:books_resource_path
+                                 toPath:books_cache_path
+                                  error:nil];
         if (result) {
             CCLog(@"books拷贝成功");
         }else {
             CCLog(@"books拷贝失败");
         }
+    }else{
+        
+        
+        
+        NSString *db_v3Path =[books_cache_path stringByAppendingPathComponent:[DB_PATH lastPathComponent]];
+        NSString *dbPath =[books_cache_path stringByAppendingPathComponent:[DB_OLD_PATH lastPathComponent]];
+        
+        //判断db_v3.sqlite3是否存在
+        if (![fm fileExistsAtPath:db_v3Path]) {
+            
+            BOOL result =[fm copyItemAtPath:[books_resource_path stringByAppendingPathComponent:[DB_PATH lastPathComponent]]
+                                     toPath:db_v3Path
+                                      error:nil];
+            
+            if (result) {
+                CCLog(@"拷贝新版本数据库成功");
+            }else{
+                CCLog(@"拷贝新版本数据库失败");
+            }
+        }
+        
+        if ([fm fileExistsAtPath:dbPath]) {
+            
+            CCLog(@"导入旧数据开始");
+            
+            //导入数据
+            [self initOldData];
+            
+            //删除旧的数据库
+            [fm removeItemAtPath:dbPath error:nil];
+        }
+        
     }
 }
+
+//导入老数据
+- (void)initOldData{
+    
+    NSMutableArray *oldBooks =[DBUtils queryAllBkBooks];
+    NSMutableArray *oldTempBooks =[DBUtils queryAllBkTempBooks];
+    
+    
+    for (Book *book in oldBooks) {
+        
+        [book setSu:@"0"];
+        [book setSt:@"0"];
+        [book setHash:@"0"];
+        [book setOpenstatus:OPEN_STATUS_YES];
+        [book setStatus:STATUS_already_download];
+        
+        [DBUtils insertBook:book];
+        
+    }
+    
+    for (Book *book in oldTempBooks) {
+        
+        
+        [book setSu:@"0"];
+        [book setSt:@"0"];
+        [book setHash:@"0"];
+        [book setOpenstatus:OPEN_STATUS_NO];
+        [book setStatus:STATUS_already_enter_code];
+        
+        [DBUtils insertBook:book];
+        
+    }
+    
+}
+
 
 
 - (void)showWaitting{
