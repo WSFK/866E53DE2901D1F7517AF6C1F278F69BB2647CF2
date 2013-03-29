@@ -99,11 +99,4 @@
     return [comps day];
 }
 
-+(NSString *) testDemo{
-  return @"testDemo";
-}
-
-+(int) testDemoAdd:(int) first second:(int) second{
-  return first + second;
-}
 @end

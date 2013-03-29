@@ -966,11 +966,6 @@
     }
     
     if ([codeType isEqualToString:CODE_TYPE_INPUT]) {
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> 整合
         return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?downloadnum=%@&su=0&st=0&hash=0",str];
     }
     
@@ -982,14 +977,10 @@
     }
     
     if ([codeType isEqualToString:CODE_TYPE_PHOTO]) {
-        
-<<<<<<< HEAD
+
         if ([str rangeOfString:@"?"].location !=NSNotFound && [str rangeOfString:@"?"].location >0) {
             
-=======
-        if ([str rangeOfString:@"?"].location !=NSNotFound && [str rangeOfString:@"?"].location >0) 
-        {
->>>>>>> 整合
+
             return [str stringByReplacingOccurrencesOfString:
                     [str substringToIndex:[str rangeOfString:@"?"].location]
                                                   withString:@"wsydlite://www.wsyd.com"];
