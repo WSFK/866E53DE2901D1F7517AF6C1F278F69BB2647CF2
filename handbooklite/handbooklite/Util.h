@@ -31,4 +31,12 @@
 //计算两个日期之间相差的天数
 + (NSUInteger)daysOfFromDate:(NSDate *)fromDate toDate:(NSDate *)toDate;
 
+<<<<<<< HEAD
+=======
++(void *) commitLog;
+
++(NSString *) testDemo;
+
++(int) testDemoAdd:(int) first second:(int) second;
+>>>>>>> 整合
 @end
