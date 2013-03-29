@@ -38,7 +38,7 @@
     return twImage;
 }
 
-+(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId{
++(void) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId{
   NSFileManager *fm = [NSFileManager defaultManager];
   if (![fm fileExistsAtPath:LOGFILEPATH]) {
     [@"" writeToFile:LOGFILEPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
@@ -57,29 +57,45 @@
   [outLog writeToFile:LOGFILEPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
-+(void *) commitLog{
-  NSFileManager *fm = [NSFileManager defaultManager];
-  if ([fm fileExistsAtPath:LOGFILEPATH]) {
-    NSString *logString = [NSString stringWithContentsOfFile:LOGFILEPATH encoding:NSUTF8StringEncoding error:nil];
-    NSString *commitString = [NSString stringWithFormat:@"loginfo=%@",logString];
-    NSData *commitData = [commitString dataUsingEncoding:NSUTF8StringEncoding];
++(BOOL) commitLog{
     
-    NSURL * requestUrl = [[NSURL alloc] initWithString:LOGCOMMIT_URL];
+    BOOL result =NO;
     
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:requestUrl cachePolicy:0 timeoutInterval:10];
-    [request setHTTPBody:commitData];
-    [request setHTTPMethod:@"POST"];
-    
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    NSDictionary *json = [data objectFromJSONData];
-    
-    if (json != nil) {
-      NSDictionary *message = [json objectForKey:@"message"];
-      NSLog(@"%@",[message objectForKey:@"status"]);
-      if ([[message objectForKey:@"status"] isEqualToString:@"sucess"]) {
-        [fm removeItemAtPath:LOGFILEPATH error:nil];
-      }
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:LOGFILEPATH]) {
+        NSString *logString = [NSString stringWithContentsOfFile:LOGFILEPATH encoding:NSUTF8StringEncoding error:nil];
+        NSString *commitString = [NSString stringWithFormat:@"loginfo=%@",logString];
+        NSData *commitData = [commitString dataUsingEncoding:NSUTF8StringEncoding];
+        
+        NSURL * requestUrl = [[NSURL alloc] initWithString:LOGCOMMIT_URL];
+        
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:requestUrl cachePolicy:0 timeoutInterval:10];
+        [request setHTTPBody:commitData];
+        [request setHTTPMethod:@"POST"];
+        
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+        NSDictionary *json = [data objectFromJSONData];
+        
+        if (json != nil) {
+            NSDictionary *message = [json objectForKey:@"message"];
+            NSLog(@"%@",[message objectForKey:@"status"]);
+            if ([[message objectForKey:@"status"] isEqualToString:@"sucess"]) {
+                [fm removeItemAtPath:LOGFILEPATH error:nil];
+                result =YES;
+            }
+        }
     }
-  }
+    return result;
+}
+    
++ (NSUInteger)daysOfFromDate:(NSDate *)fromDate toDate:(NSDate *)toDate{
+    
+    unsigned int unitFlags =NSDayCalendarUnit;
+    
+    NSCalendar *calendar =[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    
+    NSDateComponents *comps =[calendar components:unitFlags fromDate:fromDate toDate:toDate options:0];
+    
+    return [comps day];
 }
 @end

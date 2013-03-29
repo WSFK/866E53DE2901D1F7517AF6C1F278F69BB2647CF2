@@ -14,6 +14,7 @@
 #import "DBUtils.h"
 #import "JSONKit.h"
 #import "Book.h"
+#import "Util.h"
 #import "NetWorkCheck.h"
 
 
@@ -212,6 +213,9 @@
     //通知验证下载码
     [self performSelector:@selector(postVerifyNotification) withObject:nil afterDelay:1.0];
     
+    //提交日志
+    [self performSelector:@selector(submitLog) withObject:nil afterDelay:5.0];
+    
 }
 
 - (void)postVerifyNotification{
@@ -225,6 +229,35 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)submitLog{
+    
+    NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
+    
+    NSDate *lastSubmitDate =[defaults objectForKey:@"lastSubmitDate"];
+    
+    if (lastSubmitDate ==nil) {
+        [defaults setObject:[NSDate date] forKey:@"lastSubmitDate"];
+        [defaults synchronize];
+    }
+    
+    lastSubmitDate =[defaults objectForKey:@"lastSubmitDate"];
+    
+    NSDate *currDate =[NSDate date];
+    
+    NSUInteger days =[Util daysOfFromDate:lastSubmitDate toDate:currDate];
+    
+    if (days >=3) {
+        
+        BOOL result =[Util commitLog];
+        
+        if (result) {
+            [defaults setObject:currDate forKey:@"lastSubmitDate"];
+            [defaults synchronize];
+        }
+    }
+    
 }
 
 - (void)initBaseData{

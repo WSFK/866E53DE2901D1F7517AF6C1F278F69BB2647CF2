@@ -24,7 +24,11 @@
  记录日志
  参数：使用者id，记录类型:打开推送、打开新增，打开书的id
  **/
-+(void *) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId;
++(void) writeToLog:(NSString *) Uid type:(NSString *) Utype bookId:(NSString *) BookId;
 
-+(void *) commitLog;
++(BOOL) commitLog;
+
+//计算两个日期之间相差的天数
++ (NSUInteger)daysOfFromDate:(NSDate *)fromDate toDate:(NSDate *)toDate;
+
 @end
