@@ -967,6 +967,7 @@
     
     if ([codeType isEqualToString:CODE_TYPE_INPUT]) {
         
+<<<<<<< HEAD
         return [NSString stringWithFormat:@"wsydlite://www.wsyd.com?downloadnum=%@&su=0&st=0&hash=0",str];
     }
     
@@ -980,6 +981,11 @@
     if ([codeType isEqualToString:CODE_TYPE_PHOTO]) {
         
         if ([str rangeOfString:@"?"].location !=NSNotFound && [str rangeOfString:@"?"].location >0) {
+=======
+        if (isPushVerify) {
+
+            NSString *param =[NSString stringWithFormat:@"downloadnum=%@&su=push&st=%@",str,[Util getDayString]];
+>>>>>>> 修改分享信息
             
             return [str stringByReplacingOccurrencesOfString:
                     [str substringToIndex:[str rangeOfString:@"?"].location]
