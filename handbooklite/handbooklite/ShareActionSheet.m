@@ -86,27 +86,7 @@ bookShareUrl:(NSString *)bookShareUrl {
 }
 
 - (void)displayComposerSheet{
-<<<<<<< HEAD
-  mailPicker =[[MFMailComposeViewController alloc] init];
-  
-  [mailPicker setMailComposeDelegate:self];
-  
-  //设置主题
-  [mailPicker setSubject:[NSString stringWithFormat:@"%@(四维册分享)",_pdfName]];
-  
-  NSData *imgData =UIImagePNGRepresentation(_sendImage);
-  [mailPicker addAttachmentData:imgData mimeType:@"image/png" fileName:@"image.png"];
 
-  NSMutableString *mailContent = [[NSMutableString alloc] initWithFormat:@"《%@》",_pdfName];
-  [mailContent appendFormat:@"扫描以下二维码，下载<a href='%@'>《%@》</a><br>",_bookShareUrl,_pdfName];
-//  [mail_bookShareUrllndFormat:@"点击下载<a href='%@'>四维册阅读客户端</a><br>",HANDBOOKLITEAPPSTORE];
-//  [mailContent appendFormat:@"点击查看<a href='%@'>pdf版</a><br>",_pdfPath];
-  [mailContent appendFormat:@"<a href='%@'>点击这里获取帮助</a><br>",WEBHELP];
-  [mailContent appendString:@"感谢您使用四维册。"];
-  
-  [mailPicker setMessageBody:mailContent isHTML:YES];
-  [_myTarget presentModalViewController:mailPicker animated:YES];
-=======
     mailPicker =[[MFMailComposeViewController alloc] init];
     
     [mailPicker setMailComposeDelegate:self];
@@ -126,7 +106,7 @@ bookShareUrl:(NSString *)bookShareUrl {
     
     [mailPicker setMessageBody:mailContent isHTML:YES];
     [_myTarget presentModalViewController:mailPicker animated:YES];
->>>>>>> 提交日志代码
+
 }
 
 
