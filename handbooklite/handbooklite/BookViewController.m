@@ -1647,11 +1647,13 @@ __VA_ARGS__ \
   NSDictionary *json = [data objectFromJSONData];
   
   if (json != nil) {
-    NSString *pdfUrl = [json objectForKey:@"pdfUrl"];
-    if ([pdfUrl indexOfAccessibilityElement:@"http://"]) {
-
+    NSURL *pdfUrl = [NSURL URLWithString:[json objectForKey:@"pdfUrl"]];
+    if ([pdfUrl host] != nil) {
+      pdfDownUrl = [pdfUrl relativeString];
+    }else{
+      [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
     }
-    [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
+  
   }
 
   actionSheet =[ShareActionSheet actionSheetForTarget:self
