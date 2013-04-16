@@ -99,4 +99,8 @@
     return [comps day];
 }
 
++ (BOOL)isUrl:(NSString *)url{
+    NSURL *myUrl =[NSURL URLWithString:url];
+    return [myUrl scheme]!=nil && [myUrl host] !=nil && [[myUrl scheme] isEqualToString:@"http"];
+}
 @end

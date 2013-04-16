@@ -1018,7 +1018,7 @@
         return;
     }
     
-    NSString *temp =[[NSURL URLWithString:urlString] query];
+    NSString *temp =[[NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] query];
     
     NSArray *temps =[temp componentsSeparatedByString:@"&"];
     

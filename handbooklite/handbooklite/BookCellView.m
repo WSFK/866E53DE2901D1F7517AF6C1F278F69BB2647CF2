@@ -12,6 +12,7 @@
 #import "DBUtils.h"
 #import "HttpHeader.h"
 #import "PushMsg.h"
+#import "Util.h"
 
 @implementation BookCellView
 
@@ -301,7 +302,7 @@
   NSString *httpHeader = [[HttpHeader shareInstance] httpHeader];
   
   
-  iconUrlString =[NSString stringWithFormat:@"%@%@",httpHeader,iconUrlString];
+  iconUrlString =[self parseUrl:iconUrlString withHttpHeader:httpHeader];
   //下载icon
   ASIHTTPRequest *request_icon =[ASIHTTPRequest
                                  requestWithURL:
@@ -326,10 +327,12 @@
   [request_icon setShouldAttemptPersistentConnection:NO];
   [_networkQueue addOperation:request_icon];
   
+    zipUrlString =[self parseUrl:zipUrlString withHttpHeader:httpHeader];
+    
   //下载zip
   ASIHTTPRequest *request_zip =[ASIHTTPRequest
                                 requestWithURL:
-                                [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpHeader,zipUrlString]]];
+                                [NSURL URLWithString:zipUrlString]];
   
   NSString *saveZipPath =[CACHE_PATH stringByAppendingPathComponent:@"books/zips"];
   [self createPath:saveZipPath];
@@ -349,6 +352,14 @@
   [_networkQueue addOperation:request_zip];
   [_networkQueue go];
   
+}
+
+- (NSString *)parseUrl:(NSString *) url withHttpHeader:(NSString *)httpHeader{
+    if ([Util isUrl:url]) {
+        return url;
+    }else{
+        return [NSString stringWithFormat:@"%@%@",httpHeader,url];
+    }
 }
 
 

@@ -31,4 +31,6 @@
 //计算两个日期之间相差的天数
 + (NSUInteger)daysOfFromDate:(NSDate *)fromDate toDate:(NSDate *)toDate;
 
++ (BOOL)isUrl:(NSString *)url;
+
 @end
