@@ -1647,6 +1647,10 @@ __VA_ARGS__ \
   NSDictionary *json = [data objectFromJSONData];
   
   if (json != nil) {
+    NSString *pdfUrl = [json objectForKey:@"pdfUrl"];
+    if ([pdfUrl indexOfAccessibilityElement:@"http://"]) {
+
+    }
     [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
   }
 
