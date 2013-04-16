@@ -191,7 +191,7 @@
     
     CGRect frame =cell.bookIconView.frame;
     
-    [self.progressView setFrame:CGRectMake(frame.origin.x, 162,frame.size.width, 10)];
+    [self.progressView setFrame:frame];
   }
   
 }
@@ -367,6 +367,11 @@
 - (void)startProgress{
   //progress
   CGRect iconFrame =self.bookIconView.frame;
+  
+  self.progressView = [[CProgress alloc] initWithFrame:iconFrame];
+  [self addSubview:self.progressView];
+   
+  /**
   self.progressView =[[UIProgressView alloc] initWithFrame:CGRectMake(iconFrame.origin.x, 162,iconFrame.size.width, 10)];
   //Layout progressView
   [self.progressView setProgress:0];
@@ -374,6 +379,7 @@
   [self.progressView setProgressTintColor:[UIColor greenColor]];
   [self.progressView setTrackTintColor:[UIColor whiteColor]];
   [self addSubview:self.progressView];
+   **/
 }
 
 - (void)endProgress{

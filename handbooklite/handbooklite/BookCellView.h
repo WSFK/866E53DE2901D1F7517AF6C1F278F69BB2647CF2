@@ -11,6 +11,7 @@
 #import "ASIHTTPRequest.h"
 #import "ASINetworkQueue.h"
 #import "BookShelfViewController.h"
+#import "CProgress.h"
 
 #define NOTIFICATION_OF_PUSH_MSG_TO_SHOW @"notification_of_push_msg_to_show"
 
@@ -18,7 +19,8 @@
   
   UILabel *_title;
   UIView *_titleLabelBackgroundView;
-  UIProgressView *_progressView;
+//  UIProgressView *_progressView;
+  CProgress *_progressView;
   UIImageView *_backgroundView;
   UIImageView *_bookIconView;
   UIButton *_deleteBtn;
@@ -40,7 +42,8 @@
 }
 @property (nonatomic ,strong) UILabel *title;
 @property (nonatomic ,strong) UIView *titleLabelBackgroundView;
-@property (nonatomic ,strong) UIProgressView *progressView;
+//@property (nonatomic ,strong) UIProgressView *progressView;
+@property (nonatomic ,strong) CProgress *progressView;
 @property (nonatomic ,strong) UIImageView *backgroundView;
 @property (nonatomic ,strong) UIImageView *bookIconView;
 @property (nonatomic ,strong) UIButton *deleteBtn;
