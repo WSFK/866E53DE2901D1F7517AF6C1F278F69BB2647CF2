@@ -58,6 +58,8 @@
 
 @synthesize verifyHandle;
 
+@synthesize leadView;
+
 #define BOOK_CELL_NUMBER 5
 #define BOOKS_DIRECTOR @"books"
 #define SCREENSHOT_DIRECTOR @"wsyd-screenshots"
@@ -161,18 +163,47 @@
     [self setUpMMGridView];
     
     
-    
-    
-    NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
-    NSString *prompt =[defaults objectForKey:@"prompt"];
-    if (![prompt isEqualToString:@"YES"]) {
-        
-        [self performSelector:@selector(showPromptAlert) withObject:nil afterDelay:0.5];
+    if([Util getValueFromPlist:@"LEADVIEW"]){
+        [self loadLeadView];
     }
     
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+}
+
+- (void)loadLeadView{
+    NSArray *images =[[NSArray alloc] initWithObjects:@"1.png",@"2.png",@"3.png", nil];
+    
+    leadView =[[LeadView alloc] initWithFrame:CGRectMake(0,
+                                                         0,
+                                                         self.view.frame.size.width+20,
+                                                         self.view.frame.size.height)
+                               withImageNames:images];
+    [leadView setDelegate:self];
+    [self.view addSubview:leadView];
+}
+
+- (void)leadViewCancel{
+    [UIView animateWithDuration:1.0 animations:^{
+        [leadView setFrame:CGRectMake(leadView.frame.origin.x
+                                      , 768
+                                      , leadView.frame.size.width
+                                      , leadView.frame.size.height)];
+        [leadView setAlpha:0.0];
+    } completion:^(BOOL finished){
+        
+        [leadView removeFromSuperview];
+        leadView =nil;
+        
+        [Util writeValueToPlist:@"LEADVIEW" value:NO];
+        NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
+        NSString *prompt =[defaults objectForKey:@"prompt"];
+        if (![prompt isEqualToString:@"YES"]) {
+            
+            [self performSelector:@selector(showPromptAlert) withObject:nil afterDelay:0.5];
+        }
+    }];
 }
 
 

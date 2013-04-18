@@ -33,8 +33,8 @@
         imageNames =imgNames;
         
         pageControl =[[UIPageControl alloc] init];
-        [pageControl setBackgroundColor:[UIColor blackColor]];
-        [pageControl setFrame:CGRectMake((viewWidth-150)/2, (viewHeight-30)*3/4, 150, 30)];
+        [pageControl setBackgroundColor:[UIColor clearColor]];
+        [pageControl setFrame:CGRectMake((viewWidth-150)/2, (viewHeight-30)*6/7, 150, 30)];
         [pageControl setNumberOfPages:[imageNames count]];
         [pageControl setCurrentPage:0];
         [pageControl addTarget:self action:@selector(changePage) forControlEvents:UIControlEventValueChanged];
@@ -42,9 +42,8 @@
         
         //取消按钮
         button =[UIButton buttonWithType:UIButtonTypeCustom];
-        [button setFrame:CGRectMake(950, 0, 32, 46)];
-        [button setImage:[UIImage imageNamed:@"btn-back-0.png"] forState:UIControlStateNormal];
-        [button setImage:[UIImage imageNamed:@"btn-back-1.png"] forState:UIControlStateSelected];
+        [button setFrame:CGRectMake(935, 0, 85, 85)];
+        [button setImage:[UIImage imageNamed:@"cancel.png"] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(clickCancel) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:button];
         
@@ -68,16 +67,15 @@
 
 - (void)initLeadView{
     
-    float contentViewWidth =viewHeight;
-    
-    for (int i=0; i<[imageNames count]; i++) {
-        NSString *imageName =[imageNames objectAtIndex:i];
+    __block float contentViewWidth =viewHeight;
+    [imageNames enumerateObjectsUsingBlock:^(__strong id obj,NSUInteger index,BOOL *stop){
+        NSString *imageName =obj;
         UIImageView *imageView =[[UIImageView alloc]
                                  initWithImage:[UIImage imageNamed:imageName]];
-        [imageView setFrame:CGRectMake(i*viewWidth, 0, viewWidth, viewHeight)];
+        [imageView setFrame:CGRectMake(index*viewWidth, 0, viewWidth, viewHeight)];
         [scrollView addSubview:imageView];
-        contentViewWidth =i*viewWidth +viewWidth;
-    }
+        contentViewWidth =index*viewWidth +viewWidth;
+    }];
     [scrollView setContentSize:CGSizeMake(contentViewWidth, viewHeight)];
 }
 
