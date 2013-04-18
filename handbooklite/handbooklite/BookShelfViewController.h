@@ -20,6 +20,7 @@
 #import "Book.h"
 #import "VerifyHandle.h"
 #import "TwoCapture.h"
+#import "LeadView.h"
 
 #define CODE_TYPE_INPUT @"code_type_input"
 #define CODE_TYPE_PHOTO @"code_type_photo"
@@ -31,7 +32,7 @@ MMGridViewDelegate,
 MMGridViewDataSource,
 DownloadAlertViewDelegate,
 CostomAlertViewDelegate,
-UIAlertViewDelegate,VerifyHandleDelegate>
+UIAlertViewDelegate,VerifyHandleDelegate,LeadViewDelegate>
 
 {
     
@@ -80,6 +81,8 @@ UIAlertViewDelegate,VerifyHandleDelegate>
     
     BOOL isVerify;
     
+    LeadView *leadView;
+    
     
 }
 @property (nonatomic ,copy) NSString *books_path;
@@ -114,6 +117,8 @@ UIAlertViewDelegate,VerifyHandleDelegate>
 @property (nonatomic, strong) NSMutableDictionary *downloadTempDic;
 
 @property (nonatomic, strong) VerifyHandle *verifyHandle;
+
+@property (nonatomic, strong) LeadView *leadView;
 
 
 

@@ -33,7 +33,7 @@
   NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:cacheSizeMemory diskCapacity:cacheSizeDisk diskPath:@"nsurlcache"];
   [NSURLCache setSharedURLCache:sharedCache];
   
-  
+    [self showInstallOk];
   /**
   timer = [NSTimer scheduledTimerWithTimeInterval:3
                                                     target:self
@@ -409,6 +409,44 @@
 -(void) applicationDidReceiveMemoryWarning:(UIApplication *)application{
   [iConsole log:@"===> applicationDidReceiveMemoryWarning"];
    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+}
+
+-(void) showInstallOk{
+    
+    if([Util getValueFromPlist:@"SHOWINSTALLEDLOCALNOTIFICATION"]){
+        UILocalNotification *newNotification = [[UILocalNotification alloc] init];
+        if (newNotification) {
+            //时区
+            newNotification.timeZone=[NSTimeZone defaultTimeZone];
+            //推送事件---10秒后
+            newNotification.fireDate=[[NSDate date] dateByAddingTimeInterval:3];
+            //推送内容
+            newNotification.alertBody = @"您已经成功安装《四维册》阅读版。\n您可以阅读好友分享的手册。\n也可以关注我们的微博:@四维册，获取最新的四维册分享信息。";
+            //应用右上角红色图标数字
+            newNotification.applicationIconBadgeNumber = 1;
+            //注：
+            //1:格式一定要支持播放，常用的格式caf
+            //2:音频播放时间不能大于30秒
+            //3:在Resource里要找到音频文件，倒入时最好能点项目名称右键add导入
+            newNotification.soundName = UILocalNotificationDefaultSoundName;
+            newNotification.alertLaunchImage = @"icon.png";
+            //设置按钮
+            newNotification.alertAction = @"关闭";
+            //判断重复与否
+            newNotification.repeatInterval = NSWeekCalendarUnit;
+            //存入的字典，用于传入数据，区分多个通知
+            NSMutableDictionary *dicUserInfo = [[NSMutableDictionary alloc] init];
+            [dicUserInfo setValue:@"" forKey:@"clockID"];
+            newNotification.userInfo = [NSDictionary dictionaryWithObject:dicUserInfo forKey:@"dictionary"];
+            [[UIApplication sharedApplication] scheduleLocalNotification:newNotification];
+            [Util writeValueToPlist:@"SHOWINSTALLEDLOCALNOTIFICATION" value:NO];
+        }
+    }
+}
+-(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification{
+    //notification是发送通知时传入的字典信息
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"《四维册》" message:notification.alertBody delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil];
+    [alert show];
 }
 
 @end

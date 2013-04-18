@@ -33,4 +33,8 @@
 
 + (BOOL)isUrl:(NSString *)url;
 
++(BOOL) getValueFromPlist:(NSString *) key;
+
++(void) writeValueToPlist:(NSString *) key value:(BOOL) value;
+
 @end

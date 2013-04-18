@@ -103,4 +103,19 @@
     NSURL *myUrl =[NSURL URLWithString:url];
     return [myUrl scheme]!=nil && [myUrl host] !=nil && [[myUrl scheme] isEqualToString:@"http"];
 }
+
++(BOOL) getValueFromPlist:(NSString *) key{
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
+    NSDictionary *dictionary = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+    NSNumber *num = [dictionary objectForKey:key];
+    return [num boolValue];
+}
+
++(void) writeValueToPlist:(NSString *) key value:(BOOL) value{
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
+    NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
+    [dictionary setValue:[NSNumber numberWithBool:value]  forKey:key];
+    
+    [dictionary writeToFile:plistPath atomically:YES];
+}
 @end
