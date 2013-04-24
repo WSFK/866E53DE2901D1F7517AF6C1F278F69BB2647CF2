@@ -30,7 +30,7 @@
   [super viewDidLoad];
   btnStop = [[UIButton alloc] initWithFrame:CGRectMake(581, 447, 130, 45)];
   [btnStop setTitle:@"取  消" forState:UIControlStateNormal];
-  [[btnStop titleLabel] setFont:[UIFont fontWithName:@"Microsoft YaHei" size:16]];
+  [[btnStop titleLabel] setFont:DEFAULT_FONT(16)];
   [btnStop setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   UIImage *bg =[UIImage imageNamed:@"btn_green.png"];
   [btnStop setBackgroundImage:bg forState:UIControlContentVerticalAlignmentCenter];

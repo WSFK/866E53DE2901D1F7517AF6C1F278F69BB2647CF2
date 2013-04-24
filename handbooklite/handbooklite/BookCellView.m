@@ -191,7 +191,7 @@
     
     CGRect frame =cell.bookIconView.frame;
     
-    [self.progressView setFrame:CGRectMake(frame.origin.x, 162,frame.size.width, 10)];
+    [self.progressView setFrame:frame];
   }
   
 }

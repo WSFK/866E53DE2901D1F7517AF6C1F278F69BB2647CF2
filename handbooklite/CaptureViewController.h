@@ -12,6 +12,7 @@
 #import "TwoDDecoderResult.h"
 #import "QRCodeReader.h"
 #import "TwoCapture.h"
+#import "Config.h"
 
 #define degreesToRadians(x) (M_PI*(x)/180.0)
 
