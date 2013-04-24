@@ -8,6 +8,13 @@
 
 #import "PathUtils.h"
 
+//默认右下角title字体大小
+#define DEFAULT_TITLE_FONT_SIZE        16
+//默认控制区按钮字体大小
+#define DEFAULT_BUTTON_FONT_SIZE 12
+//默认字体
+#define DEFAULT_FONT(s) [UIFont fontWithName:@"Microsoft YaHei" size:s]
+
 #define ORIENTATION @"landscape"
 
 #define RESOURCE_PATH [PathUtils resourcePath]
@@ -18,7 +25,7 @@
 #define DB_OLD_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db.sqlite3"]
 #define DB_PATH [[PathUtils cachePath] stringByAppendingPathComponent:@"books/db_v3.sqlite3"]
 
-#define BASE_URL @"http://192.168.1.100:8085/"
+#define BASE_URL @"http://192.168.1.102:8085/"
 //#define BASE_URL @"http://ms.thoughtfactory.com.cn/"
 //#define BASE_URL [[[UIDevice currentDevice] model] isEqualToString:@"iPad Simulator"]?@"http://192.168.1.100:8085/":@"http://ms.thoughtfactory.com.cn/"
 

@@ -33,28 +33,28 @@
 
 - (void)viewDidLoad
 {
-    [_titleView setFont:[UIFont fontWithName:@"Microsoft YaHei" size:20]];
+    [_titleView setFont:DEFAULT_FONT(20)];
     [_titleView setTextAlignment:UITextAlignmentLeft];
     [_titleView setTextColor:[UIColor whiteColor]];
     [_titleView setText:[currentBook name]];
     
     [_lbHome setText:@"首页"];
-    [_lbHome setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [_lbHome setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [_lbHome setTextAlignment:UITextAlignmentCenter];
     [_lbHome setTextColor:[UIColor whiteColor]];
     
     [_lbDraw setText:@"绘图"];
-    [_lbDraw setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [_lbDraw setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [_lbDraw setTextColor:[UIColor whiteColor]];
     [_lbDraw setTextAlignment:UITextAlignmentCenter];
     
     [_lbTwoCode setText:@"二维码"];
-    [_lbTwoCode setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [_lbTwoCode setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [_lbTwoCode setTextColor:[UIColor whiteColor]];
     [_lbTwoCode setTextAlignment:UITextAlignmentCenter];
     
     [_lbShare setText:@"分享"];
-    [_lbShare setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [_lbShare setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [_lbShare setTextColor:[UIColor whiteColor]];
     [_lbShare setTextAlignment:UITextAlignmentCenter];
     

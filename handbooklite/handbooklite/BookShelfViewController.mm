@@ -91,22 +91,22 @@
 {
  
     [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg.png"]]];
-    [self.lbTitle setFont:[UIFont fontWithName:@"Microsoft YaHei" size:16]];
+    [self.lbTitle setFont:DEFAULT_FONT(DEFAULT_TITLE_FONT_SIZE)];
     [self.lbTitle setTextAlignment:UITextAlignmentRight];
     [self.lbTitle setTextColor:[UIColor whiteColor]];
     [self.lbTitle setText:@"维思远达"];
     
-    [self.lbPhoto setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [self.lbPhoto setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [self.lbPhoto setTextColor:[UIColor whiteColor]];
     [self.lbPhoto setTextAlignment:UITextAlignmentCenter];
     [self.lbPhoto setText:@"拍照"];
     
-    [self.lbLxwm setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [self.lbLxwm setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [self.lbLxwm setTextColor:[UIColor whiteColor]];
     [self.lbLxwm setTextAlignment:UITextAlignmentCenter];
     [self.lbLxwm setText:@"联系我们"];
     
-    [self.lbEdit setFont:[UIFont fontWithName:@"Microsoft YaHei" size:12]];
+    [self.lbEdit setFont:DEFAULT_FONT(DEFAULT_BUTTON_FONT_SIZE)];
     [self.lbEdit setTextColor:[UIColor whiteColor]];
     [self.lbEdit setTextAlignment:UITextAlignmentCenter];
     [self.lbEdit setText:@"编辑"];
@@ -1146,7 +1146,8 @@
         
         
         
-        if ([@"success" isEqualToString:[data objectForKey:@"status"]]) {
+        if ([@"success" isEqualToString:[data objectForKey:@"status"]] ||
+            [@"success_temp_share" isEqualToString:[data objectForKey:@"status"]]) {
             
             NSDictionary *book =[data objectForKey:@"book"];
             
@@ -1159,15 +1160,15 @@
             [b setStatus:STATUS_downloading_waitting];
             
         }
-        else if([@"not_found" isEqualToString:[data objectForKey:@"status"]]){
+        else if([@"failed_not_found" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_not_found];
         }
-        else if([@"not_share" isEqualToString:[data objectForKey:@"status"]]){
+        else if([@"failed_not_share" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_not_share];
         }
-        else if([@"out_date" isEqualToString:[data objectForKey:@"status"]]){
+        else if([@"failed_out_date" isEqualToString:[data objectForKey:@"status"]]){
             
             [b setStatus:STATUS_already_enter_code_out_date];
         }
