@@ -9,7 +9,7 @@
 #ifndef handbooklite_PublicImport_h
 #define handbooklite_PublicImport_h
 
-#import "UUID.h"
+#import "UserInfo.h"
 #import "Util.h"
 #import "Config.h"
 #import "TokenUtil.h"
@@ -17,7 +17,7 @@
 #import "PathUtils.h"
 
 #define DEVICEUUID [Util getDeviceId]
-#define USERUUID [UUID getUUIDToString]
+#define USERUUID [UserInfo getUID]
 #define DEVICETOKEN [TokenUtil getLocalToken]
 
 #define CACHEPATH [PathUtils cachePath]

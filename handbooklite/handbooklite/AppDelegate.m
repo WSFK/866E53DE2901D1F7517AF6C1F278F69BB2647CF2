@@ -447,6 +447,7 @@
     //notification是发送通知时传入的字典信息
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"《四维册》" message:notification.alertBody delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil];
     [alert show];
+    application.applicationIconBadgeNumber = 0;
 }
 
 @end
