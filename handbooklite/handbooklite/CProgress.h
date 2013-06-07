@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define PROGRESS_ALPHA_DEFAULT 0.6
+
 @interface CProgress : UIView{
   UIImageView *grayView;
 }

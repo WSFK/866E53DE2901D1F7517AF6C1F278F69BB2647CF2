@@ -19,7 +19,7 @@
   [self setBackgroundColor:[UIColor clearColor]];
   grayView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
   [grayView setBackgroundColor:[UIColor grayColor]];
-  [grayView setAlpha:.6];
+  [grayView setAlpha:PROGRESS_ALPHA_DEFAULT];
   [self addSubview:grayView];
     return self;
 }

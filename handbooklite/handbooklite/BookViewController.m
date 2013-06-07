@@ -1635,35 +1635,73 @@ __VA_ARGS__ \
 
 //点击分享
 - (void)didShare:(id)sender{
-  //book 的pdf操作
-  NSMutableString *pdfDownUrl = [[NSMutableString alloc] initWithString:BASE_URL];
-  
-  NSString *pdfRequest = [NSString stringWithFormat:@"%@bookid='%@'",PDFREQUEST,currentBook.downnum];
-  NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:pdfRequest] cachePolicy:0 timeoutInterval:10];
-  [request setHTTPMethod:@"GET"];
-  
-  NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-  
-  NSDictionary *json = [data objectFromJSONData];
-  
-  if (json != nil) {
-    NSURL *pdfUrl = [NSURL URLWithString:[json objectForKey:@"pdfUrl"]];
-    if ([pdfUrl host] != nil) {
-      pdfDownUrl = [pdfUrl relativeString];
-    }else{
-      [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
-    }
-  
-  }
-
-  actionSheet =[ShareActionSheet actionSheetForTarget:self
-                                                              sendImage:[Util getShareTwoCode:currentBook.downnum]
-                                                                sendPdf:pdfDownUrl
-                                                            sendPdfName:currentBook.name
-                bookShareUrl:[Util getShareTwoCodeUrlString:currentBook.downnum]];
-  
-  [actionSheet setMailDelegate:self];
-  [actionSheet showInView:self.view];
+    /**
+     NSMutableString *pdfDownUrl = [[NSMutableString alloc] initWithString:BASE_URL];
+     NSString *pdfRequest = [NSString stringWithFormat:@"%@bookid='%@'",PDFREQUEST,currentBook.downnum];
+     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:pdfRequest]
+     cachePolicy:0
+     timeoutInterval:10];
+     [request setHTTPMethod:@"GET"];
+     NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+     
+     NSDictionary *json = [data objectFromJSONData];
+     NSLog(@"-------------------------:%@",json);
+     if (json != nil) {
+     NSURL *pdfUrl = [NSURL URLWithString:[json objectForKey:@"pdfUrl"]];
+     if ([pdfUrl host] != nil) {
+     pdfDownUrl = [pdfUrl relativeString];
+     }else{
+     [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
+     }
+     }
+     */
+    
+    //book 的pdf操作
+    
+    /**  */
+    __block NSMutableString *pdfDownUrl = [[NSMutableString alloc] initWithString:BASE_URL];
+    __block NSData *data;
+    dispatch_queue_t dlPdfQueue =dispatch_queue_create("downloadPdf", NULL);
+    dispatch_async(dlPdfQueue, ^{
+        NSString *pdfRequest = [NSString stringWithFormat:@"%@bookId=%@",PDFREQUEST,currentBook.downnum];
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:pdfRequest]
+                                                                   cachePolicy:0
+                                                               timeoutInterval:10];
+        [request setHTTPMethod:@"GET"];
+        data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    });
+    
+    double delayInSeconds = 1.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_queue_t queue =dispatch_queue_create("tishi", NULL);
+    dispatch_after(popTime, queue, ^(void){
+        if (data ==nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self showMessage:@"请求超时，请稍后再试!"];
+            });
+            
+        }else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSDictionary *json = [data objectFromJSONData];
+                if (json != nil) {
+                    NSURL *pdfUrl = [NSURL URLWithString:[json objectForKey:@"pdfUrl"]];
+                    if ([pdfUrl host] != nil) {
+                        pdfDownUrl = [pdfUrl relativeString];
+                    }else{
+                        [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
+                    }
+                }
+                actionSheet =[ShareActionSheet actionSheetForTarget:self
+                                                          sendImage:[Util getShareTwoCode:currentBook.downnum]
+                                                            sendPdf:pdfDownUrl
+                                                        sendPdfName:currentBook.name
+                                                       bookShareUrl:[Util getShareTwoCodeUrlString:currentBook.downnum]];
+                [actionSheet setMailDelegate:self];
+                [actionSheet showInView:self.view];
+            });
+        }
+    });
+    
 }
 
 #pragma mark -SendMailDelegate

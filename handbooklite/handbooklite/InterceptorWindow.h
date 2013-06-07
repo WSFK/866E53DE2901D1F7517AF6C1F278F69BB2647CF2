@@ -33,7 +33,9 @@
 #import "iConsole.h"
 @class BookViewController;
 
-@interface InterceptorWindow : iConsoleWindow {
+//调试:iConsoleWindow
+
+@interface InterceptorWindow : UIWindow {
     UIView *target;
 	BookViewController *eventsDelegate;
 	

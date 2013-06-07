@@ -67,7 +67,7 @@
     [self.title setTextAlignment:UITextAlignmentCenter];
     self.title.backgroundColor = [UIColor clearColor];
     self.title.textColor = [UIColor whiteColor];
-    [self.title setFont:[UIFont fontWithName:@"Microsoft YaHei" size:11]];
+      [self.title setFont:DEFAULT_FONT(11)];
     
     [self.titleLabelBackgroundView addSubview:self.title];
     [self addSubview:self.titleLabelBackgroundView];
@@ -365,21 +365,22 @@
 
 
 - (void)startProgress{
-  //progress
-  CGRect iconFrame =self.bookIconView.frame;
-  
-  self.progressView = [[CProgress alloc] initWithFrame:iconFrame];
-  [self addSubview:self.progressView];
-   
-  /**
-  self.progressView =[[UIProgressView alloc] initWithFrame:CGRectMake(iconFrame.origin.x, 162,iconFrame.size.width, 10)];
-  //Layout progressView
-  [self.progressView setProgress:0];
-  [self.progressView setProgressViewStyle:UIProgressViewStyleDefault];
-  [self.progressView setProgressTintColor:[UIColor greenColor]];
-  [self.progressView setTrackTintColor:[UIColor whiteColor]];
-  [self addSubview:self.progressView];
-   **/
+    //progress
+    CGRect iconFrame =self.bookIconView.frame;
+    
+    self.progressView = [[CProgress alloc] initWithFrame:iconFrame];
+    [self.progressView setAlpha:0.0];
+    [self addSubview:self.progressView];
+    
+    /**
+     self.progressView =[[UIProgressView alloc] initWithFrame:CGRectMake(iconFrame.origin.x, 162,iconFrame.size.width, 10)];
+     //Layout progressView
+     [self.progressView setProgress:0];
+     [self.progressView setProgressViewStyle:UIProgressViewStyleDefault];
+     [self.progressView setProgressTintColor:[UIColor greenColor]];
+     [self.progressView setTrackTintColor:[UIColor whiteColor]];
+     [self addSubview:self.progressView];
+     **/
 }
 
 - (void)endProgress{
@@ -506,6 +507,12 @@
       NSString *bookName =[userinfo objectForKey:@"bookName"];
       
       [self.title setText:bookName];
+        
+        double delayInSeconds = 0.3;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            [self.progressView setAlpha:PROGRESS_ALPHA_DEFAULT];
+        });
       
     }
     

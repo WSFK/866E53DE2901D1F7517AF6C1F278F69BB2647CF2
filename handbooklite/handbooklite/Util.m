@@ -9,10 +9,12 @@
 #import "Util.h"
 
 @implementation Util
+/**
 + (NSString *) getDeviceId{
   NSString *deviceId = [[UIDevice currentDevice] uniqueIdentifier];
   return deviceId;
 }
+*/
 
 +(NSString*) getDayString{
   NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
@@ -104,18 +106,55 @@
     return [myUrl scheme]!=nil && [myUrl host] !=nil && [[myUrl scheme] isEqualToString:@"http"];
 }
 
-+(BOOL) getValueFromPlist:(NSString *) key{
-    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
-    NSDictionary *dictionary = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
-    NSNumber *num = [dictionary objectForKey:key];
-    return [num boolValue];
+/**
+ +(BOOL) getValueFromPlist:(NSString *) key{
+ NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
+ NSDictionary *dictionary = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+ NSNumber *num = [dictionary objectForKey:key];
+ return [num boolValue];
+ }
+ 
+ +(void) writeValueToPlist:(NSString *) key value:(BOOL) value{
+ NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
+ NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
+ [dictionary setValue:[NSNumber numberWithBool:value]  forKey:key];
+ BOOL result =[dictionary writeToFile:plistPath atomically:YES];
+ if (!result) {
+ UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"show write" message:[NSString stringWithFormat:@"value:%d--result:%d",value,result] delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+ [alert show];
+ }
+ }
+ */
+
++ (NSString *)getAppVersionFromAppInfoOfString{
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 }
 
-+(void) writeValueToPlist:(NSString *) key value:(BOOL) value{
-    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"show" ofType:@"plist"];
-    NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
-    [dictionary setValue:[NSNumber numberWithBool:value]  forKey:key];
-    
-    [dictionary writeToFile:plistPath atomically:YES];
++ (double)getAppVersionFromAppInfo{
+    return [[self getAppVersionFromAppInfoOfString] doubleValue];
+}
+
++ (NSString *)getAppVersionFromSettingOfString{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"app_version"];
+}
+
++ (double)getAppVersionFromSetting{
+    return [[self getAppVersionFromSettingOfString] doubleValue];
+}
+
++ (BOOL)isAppVersionUpdate{
+    return [self getAppVersionFromAppInfo] >[self getAppVersionFromSetting];
+}
+
++ (BOOL)updateAppVersionToSetting{
+    NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
+    [defaults setObject:[self getAppVersionFromAppInfoOfString] forKey:@"app_version"];
+    return [defaults synchronize];
+}
+
++ (BOOL)updateAppVersionToSetting:(NSString *)currentAppVersion{
+    NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
+    [defaults setObject:currentAppVersion forKey:@"app_version"];
+    return [defaults synchronize];
 }
 @end

@@ -163,7 +163,7 @@
     [self setUpMMGridView];
     
     
-    if([Util getValueFromPlist:@"LEADVIEW"]){
+    if([Util isAppVersionUpdate]){
         [self loadLeadView];
     }
     
@@ -196,7 +196,7 @@
         [leadView removeFromSuperview];
         leadView =nil;
         
-        [Util writeValueToPlist:@"LEADVIEW" value:NO];
+        [Util updateAppVersionToSetting];
         NSUserDefaults *defaults =[NSUserDefaults standardUserDefaults];
         NSString *prompt =[defaults objectForKey:@"prompt"];
         if (![prompt isEqualToString:@"YES"]) {
@@ -518,8 +518,11 @@
         
         if ([STATUS_downloading_suspend isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
         
-           [cell.suspendView setHidden:NO];
-           [cell.lbdling setHidden:YES];
+            [cell.suspendView setHidden:NO];
+            [cell.lbdling setHidden:YES];
+            [[cell bookIconView] setAlpha:0.4];
+            [[cell bookIconView] setBackgroundColor:[UIColor whiteColor]];
+            [[cell iconNewImgView] setAlpha:0.4];
         }
         
         if ([STATUS_downloading_waitting isEqualToString:[statusDic objectForKey:STATUS_DIC_KEY]]) {
@@ -586,6 +589,8 @@
             [STATUS_downloading_suspend isEqualToString:[book status]] ||
             [STATUS_downloading_exception isEqualToString:[book status]]) {
             
+            
+            
             if (![NetWorkCheck checkReachable]) {
                 return;
             }
@@ -593,6 +598,9 @@
             [[(BookCellView *)cell suspendView] setHidden:YES];
             [[(BookCellView *)cell lbdling] setHidden:NO];
             [[(BookCellView *)cell lbdling] setText:@"等待中..."];
+            [[(BookCellView *)cell bookIconView] setAlpha:1.0];
+            [[(BookCellView *)cell bookIconView] setBackgroundColor:[UIColor clearColor]];
+            [[(BookCellView *)cell iconNewImgView] setAlpha:1.0];
             [self addDownloadTempArray:book index:index];
             
             return;
@@ -601,6 +609,9 @@
         if ([STATUS_downloading isEqualToString:[book status]]) {
             
             [(BookCellView *)cell cancelDownload];
+            [[(BookCellView *)cell bookIconView] setAlpha:0.4];
+            [[(BookCellView *)cell bookIconView] setBackgroundColor:[UIColor whiteColor]];
+            [[(BookCellView *)cell iconNewImgView] setAlpha:0.4];
             [DBUtils updateBookStatus:STATUS_downloading_suspend downnum:[book downnum]];
             
             return;
@@ -829,7 +840,8 @@
 #pragma -mark DownloadAlertViewDelegate
 - (void)commitWithText:(NSString *)text{
     
-    [self openBookByURL:[self saxReader:text codeType:CODE_TYPE_INPUT]];
+    [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:text codeType:CODE_TYPE_INPUT] afterDelay:0.1];
+    //[self openBookByURL:[self saxReader:text codeType:CODE_TYPE_INPUT]];
     
 }
 

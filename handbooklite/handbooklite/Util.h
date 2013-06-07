@@ -11,7 +11,7 @@
 #import "QRCodeGenerator.h"
 
 @interface Util : NSObject
-+ (NSString *) getDeviceId;   //获取设备id
+//+ (NSString *) getDeviceId;   //获取设备id
 
 +(NSString*) getDayString;    //获取当前时间字符串
 
@@ -33,8 +33,22 @@
 
 + (BOOL)isUrl:(NSString *)url;
 
-+(BOOL) getValueFromPlist:(NSString *) key;
+//+(BOOL) getValueFromPlist:(NSString *) key;
 
-+(void) writeValueToPlist:(NSString *) key value:(BOOL) value;
+//+(void) writeValueToPlist:(NSString *) key value:(BOOL) value;
+
++ (NSString *)getAppVersionFromSettingOfString;
+
++ (double)getAppVersionFromSetting;
+
++ (NSString *)getAppVersionFromAppInfoOfString;
+
++ (double)getAppVersionFromAppInfo;
+
++ (BOOL)isAppVersionUpdate;
+
++ (BOOL)updateAppVersionToSetting;
+
++ (BOOL)updateAppVersionToSetting:(NSString *)currentAppVersion;
 
 @end
