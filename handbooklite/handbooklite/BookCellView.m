@@ -109,7 +109,8 @@
     self.iconNewImgView =[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"new.png"]];
     [self.iconNewImgView setFrame:CGRectNull];
     [self.iconNewImgView setHidden:YES];
-    [self addSubview:self.iconNewImgView];
+    [self.bookIconView addSubview:self.iconNewImgView];
+    //[self addSubview:self.iconNewImgView];
     
     
     //deleteBtn
@@ -178,12 +179,9 @@
                                              cellX:cell.bookIconView.frame.origin.x
                                              cellY:cell.bookIconView.frame.origin.y];
   
-  cell.iconNewImgView.frame =[self initNewViewFrameWithImgW:iconImage.size.width
-                                                       imgH:iconImage.size.height
-                                                      cellW:cellFrame.size.width
-                                                      cellH:cellFrame.size.height
-                                                      cellX:cellFrame.origin.x
-                                                      cellY:cellFrame.origin.y];
+    cell.iconNewImgView.frame =[self initNewViewFrameWithCellIconW:
+                                cell.bookIconView.frame.size.width
+                                                         cellIconW:cell.bookIconView.frame.size.height];
   
   [cell.bookIconView setImage:iconImage];
   
@@ -271,20 +269,9 @@
 }
 
 //获取当前手册的newView  Frame
-- (CGRect)initNewViewFrameWithImgW:(double)iw imgH:(double)ih cellW:(double)cw cellH:(double)ch cellX:(CGFloat)x cellY:(CGFloat)y{
-  
-  if (iw >ih) {
-    double nifh = ch * ih / iw;
-    double difh = ch - nifh;
-    return CGRectMake(cw-43 , (ch - difh)-5, 45, 45);
+- (CGRect)initNewViewFrameWithCellIconW:(double)ciconW cellIconW:(double)ciconH{
     
-  }else{
-    
-    double nifw = cw * iw / ih;
-    double difw = cw - nifw;
-    
-    return CGRectMake((cw- difw)-25 , ch-40 , 45, 45);
-  }
+    return CGRectMake(ciconW-45, ciconH-45, 45, 45);
 }
 
 
