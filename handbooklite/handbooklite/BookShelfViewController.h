@@ -80,6 +80,7 @@ UIAlertViewDelegate,VerifyHandleDelegate,LeadViewDelegate>
     VerifyHandle *verifyHandle;
     
     BOOL isVerify;
+    BOOL isDismiss;
     
     LeadView *leadView;
     

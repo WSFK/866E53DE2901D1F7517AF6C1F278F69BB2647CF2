@@ -145,6 +145,10 @@
                                                name:@"push_notification"
                                              object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(enterBackground)
+                                                 name:NOTIFICATION_ENTER_BACKGROUND
+                                               object:nil];
   
     //初始化联系我们
     _contactUsView =[[ContactUsViewController alloc]
@@ -866,10 +870,13 @@
   
   UIViewController *cap = [[NSClassFromString(@"CaptureViewController") alloc] initWithNibName:@"CaptureViewController" bundle:nil];
   [self presentModalViewController:cap animated:YES];
+    isDismiss =YES;
 }
 
 #pragma mark -- new Zxing Function
 -(void) showTwoCodeResult:(NSNotification *)notifi{
+    
+    isDismiss =NO;
   [self dismissModalViewControllerAnimated:YES];
   
   TwoCapture *tc = [TwoCapture newInstence];
@@ -881,6 +888,13 @@
     [self performSelector:@selector(openBookByURL:) withObject:[self saxReader:result codeType:CODE_TYPE_PHOTO] afterDelay:1.0];
   }
   
+}
+
+- (void)enterBackground{
+    if (isDismiss) {
+        [self dismissModalViewControllerAnimated:YES];
+        isDismiss =NO;
+    }
 }
 
 #pragma -mark UIAlertViewDelegate

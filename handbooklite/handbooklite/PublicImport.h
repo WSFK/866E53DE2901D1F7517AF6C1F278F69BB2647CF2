@@ -26,4 +26,5 @@
 
 #define LOG_TYPE_OPEN_PUSH @"openPush"
 #define LOG_TYPE_NEW_CLICK @"newClick"
+#define NOTIFICATION_ENTER_BACKGROUND @"enter_background"
 #endif

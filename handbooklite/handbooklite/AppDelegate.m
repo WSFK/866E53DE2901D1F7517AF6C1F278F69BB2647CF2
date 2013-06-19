@@ -16,6 +16,7 @@
 #import "Book.h"
 #import "Util.h"
 #import "NetWorkCheck.h"
+#import "PublicImport.h"
 
 
 
@@ -186,6 +187,7 @@
         
     }];
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ENTER_BACKGROUND object:nil];
     
     // Start the long-running task and return immediately.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
