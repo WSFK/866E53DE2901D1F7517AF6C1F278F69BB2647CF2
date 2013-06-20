@@ -114,14 +114,15 @@
 }
 
 - (void)sendNotification:(NSDictionary *)aps{
-    
-    NSString *message =[(NSDictionary *)[aps objectForKey:@"alert"] objectForKey:@"body"];
-    NSString *downnum =[aps objectForKey:@"downnum"];
-    NSMutableDictionary *pushData =[[NSMutableDictionary alloc] init];
-    [pushData setObject:message forKey:@"message"];
-    [pushData setObject:downnum forKey:@"downnum"];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"push_notification" object:pushData];
+    if (aps) {
+        NSString *message =[(NSDictionary *)[aps objectForKey:@"alert"] objectForKey:@"body"];
+        NSString *downnum =[aps objectForKey:@"downnum"];
+        NSMutableDictionary *pushData =[[NSMutableDictionary alloc] init];
+        [pushData setObject:message forKey:@"message"];
+        [pushData setObject:downnum forKey:@"downnum"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"push_notification" object:pushData];
+    }
 }
 
 //实现推送回调函数
