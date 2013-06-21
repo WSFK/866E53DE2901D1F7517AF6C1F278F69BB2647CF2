@@ -21,6 +21,7 @@
 #import "VerifyHandle.h"
 #import "TwoCapture.h"
 #import "LeadView.h"
+#import "BookViewController.h"
 
 #define CODE_TYPE_INPUT @"code_type_input"
 #define CODE_TYPE_PHOTO @"code_type_photo"
@@ -32,6 +33,7 @@ MMGridViewDelegate,
 MMGridViewDataSource,
 DownloadAlertViewDelegate,
 CostomAlertViewDelegate,
+BookViewDelegate,
 UIAlertViewDelegate,VerifyHandleDelegate,LeadViewDelegate>
 
 {
@@ -83,6 +85,9 @@ UIAlertViewDelegate,VerifyHandleDelegate,LeadViewDelegate>
     BOOL isDismiss;
     
     LeadView *leadView;
+    
+    NSString *currentDownnum;//全局变量 下载码
+    BOOL isOpeningBook;//是否当前正在打开手册
     
     
 }

@@ -10,7 +10,6 @@
 #import "IndexViewController.h"
 #import "Properties.h"
 #import "TopViewController.h"
-#import "BookShelfViewController.h"
 #import "Book.h"
 #import "DrawViewController.h"
 #import "TowCodeAlertView.h"
@@ -18,6 +17,10 @@
 #import "PublicImport.h"
 #import "ShareActionSheet.h"
 
+@protocol BookViewDelegate <NSObject>
+@required
+- (void)didbookViewControllerToHome;//点击Home操作
+@end
 
 @interface BookViewController : UIViewController<SendMailDelegate,TopViewDelegate,UIWebViewDelegate, UIScrollViewDelegate,TowCodeAlertDelegate>
 {

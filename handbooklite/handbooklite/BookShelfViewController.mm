@@ -9,7 +9,6 @@
 #import "BookShelfViewController.h"
 #import "JSONKit.h"
 #import "BookCellView.h"
-#import "BookViewController.h"
 #import "QRCodeReader.h"
 #import "NSString_NSString.h"
 #import "NetWorkCheck.h"
@@ -171,7 +170,7 @@
         [self loadLeadView];
     }
     
-    
+    isOpeningBook =NO;
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }
@@ -1107,8 +1106,7 @@
     
     
     if([self isHasBookLocation:book]){
-        //本地手册已经存在  直接打开手册
-        [self toBookView:book];
+        [self openCurrentBook:book];
         return;
     }
     if (![DBUtils isExistBookByDownnum:downnum]) {
@@ -1138,6 +1136,22 @@
         [self.gridView scrollToCellAtIndex:[self.gridView getIndexByDownnum:[book downnum]]];
     }
     
+}
+
+//打开当前手册
+- (void)openCurrentBook:(Book *)book {
+    /**
+     1、判断当前是否有打开的手册
+     2、判断当前打开的手册是不是目前这本
+     */
+    if (isOpeningBook) {
+        if (![currentDownnum isEqualToString:[book downnum]]) {
+            [self dismissModalViewControllerAnimated:NO];
+            [self toBookView:book];
+        }
+    }else{
+        [self toBookView:book];
+    }
 }
 
 //列表验证下载码
@@ -1221,6 +1235,8 @@
 
 - (void)toBookView:(Book *)book{
     
+    isOpeningBook =YES;
+    currentDownnum =[book downnum];
     NSString *bookCachePath = [_cacheBookPath stringByAppendingPathComponent:[book dir]];
     NSString *bookBundlePath = [_bundleBookPath stringByAppendingPathComponent:[book dir]];
     
@@ -1251,6 +1267,12 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"willRotate" object:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"didRotate" object:nil];
     
+}
+
+#pragma -mark BookViewDelegate
+-(void)didbookViewControllerToHome{
+    isOpeningBook =NO;
+    currentDownnum =@"";
 }
 
 //判断本地手册是否存在

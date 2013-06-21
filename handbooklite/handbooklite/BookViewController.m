@@ -71,6 +71,7 @@ __VA_ARGS__ \
 @synthesize scrollView;
 @synthesize currPage;
 @synthesize currentPageNumber;
+@synthesize delegate;
 
 
 
