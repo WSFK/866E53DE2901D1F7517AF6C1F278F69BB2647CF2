@@ -90,6 +90,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIWebView *currPage;
 @property int currentPageNumber;
+@property (nonatomic, assign) id<BookViewDelegate> delegate;
 
 
 #pragma mark - INIT
