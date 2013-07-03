@@ -9,27 +9,35 @@
 #import "ShareActionSheet.h"
 #import "SinaweiboShare.h"
 #import "iToast.h"
+#import "WeiXinShare.h"
 
 @implementation ShareActionSheet
 
 //@synthesize mailDelegate;
 
-+ (ShareActionSheet *)actionSheetForTarget:(UIViewController *)target sendImage:(UIImage *)image
-                                   sendPdf:(NSString*) pdfFilePath sendPdfName:(NSString*) pdfFileName
-bookShareUrl:(NSString *)bookShareUrl {
++ (ShareActionSheet *)actionSheetForTarget:(UIViewController *)target
+                                 sendImage:(UIImage *)image
+                                   sendPdf:(NSString*) pdfFilePath
+                               sendPdfName:(NSString*) pdfFileName
+                              bookShareUrl:(NSString *)bookShareUrl
+                                  indexPic:(UIImage *)indexPic
+                                  bookName:(NSString *)name{
     
-  ShareActionSheet *as = [[ShareActionSheet alloc] initWithTitle:@"分享"
-                                                        delegate:(id)self
-                                               cancelButtonTitle:nil
-                                          destructiveButtonTitle:nil
-                                               otherButtonTitles:nil];
-  [as setMyTarget:target];
-  [as setSendImage:image];
-  [as setPdfPath:pdfFilePath];
-  [as setPdfName:pdfFileName];
-  [as addButtonWithTitle:@"新浪微博"];
-  [as addButtonWithTitle:@"Email"];
-  [as setBookShareUrl:bookShareUrl];
+    ShareActionSheet *as = [[ShareActionSheet alloc] initWithTitle:@"分享"
+                                                          delegate:(id)self
+                                                 cancelButtonTitle:nil
+                                            destructiveButtonTitle:nil
+                                                 otherButtonTitles:nil];
+    [as setMyTarget:target];
+    [as setSendImage:image];
+    [as setIndexImage:indexPic];
+    [as setPdfPath:pdfFilePath];
+    [as setPdfName:pdfFileName];
+    [as setBookName:name];
+    [as addButtonWithTitle:@"新浪微博"];
+    [as addButtonWithTitle:@"微 信"];
+    [as addButtonWithTitle:@"Email"];
+    [as setBookShareUrl:bookShareUrl];
 	return as;
 }
 
@@ -41,6 +49,9 @@ bookShareUrl:(NSString *)bookShareUrl {
             [self shareSinaWeibo];
             break;
         case 1:
+            [self shareWeiXin];
+            break;
+        case 2:
             [self sendMail];
             break;
         default:
@@ -50,18 +61,27 @@ bookShareUrl:(NSString *)bookShareUrl {
 	[super dismissWithClickedButtonIndex:buttonIndex animated:animated];
 }
 
+//微信分享
+- (void)shareWeiXin{
+    UIImage *img =_indexImage?_indexImage:_sendImage;
+    [WeiXinShare sendShareWithImage:img
+                        description:[NSString stringWithFormat:@"《%@》 精彩内容",_bookName]
+                                url:_bookShareUrl];
+}
+
 //新浪微博分享
 - (void)shareSinaWeibo{
     
-    //判断二维码是否存在
-    if (_sendImage == nil) {
-        
-        iToast *toast =[iToast makeToast:@"网络连接异常，请稍后再试"];
-        [toast setToastPosition:kToastPositionBottom];
-        [toast setToastDuration:kToastDurationNormal];
-        [toast show];
-        return;
-    }
+    /**判断二维码是否存在
+     if (_sendImage == nil) {
+     
+     iToast *toast =[iToast makeToast:@"网络连接异常，请稍后再试"];
+     [toast setToastPosition:kToastPositionBottom];
+     [toast setToastDuration:kToastDurationNormal];
+     [toast show];
+     return;
+     }
+     */
   NSMutableString *weiboContent = [[NSMutableString alloc] initWithString:_pdfName];
   [weiboContent appendFormat:@"(四维册分享：%@)",HANDBOOKLITEAPPSTORE];
   [weiboContent appendString:@"使用四维册拍取二维码，下载手册"];

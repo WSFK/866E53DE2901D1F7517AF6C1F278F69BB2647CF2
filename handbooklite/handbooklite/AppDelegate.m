@@ -76,6 +76,9 @@
 //        }
 //    }
   
+    //向微信终端注册你的id
+    [WXApi registerApp:WEI_XIN_APP_ID];
+    
   sinaweibo = [[SinaWeibo alloc] initWithAppKey:kAppKey appSecret:kAppSecret appRedirectURI:kAppRedirectURI andDelegate:nil];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSDictionary *sinaweiboInfo = [defaults objectForKey:@"SinaWeiboAuthData"];
@@ -155,14 +158,47 @@
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url{
     
     if ([@"wsydlite" isEqualToString:[url scheme]]) {
-        
         //添加 或 打开一本手册
-        
         [[NSNotificationCenter defaultCenter] postNotificationName:@"open_or_add_notification" object:[url absoluteString]];
-        
         return YES;
     }
+    if ([WEI_XIN_APP_ID isEqualToString:[url scheme]]) {
+        //微信
+        return  [WXApi handleOpenURL:url delegate:self];
+    }
     return NO;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    if ([@"wsydlite" isEqualToString:[url scheme]]) {
+        //添加 或 打开一本手册
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"open_or_add_notification" object:[url absoluteString]];
+        return YES;
+    }
+    if ([WEI_XIN_APP_ID isEqualToString:[url scheme]]) {
+        //微信
+        return  [WXApi handleOpenURL:url delegate:self];
+    }
+    return NO;
+}
+
+#pragma -mark WXApiDelegate
+- (void)onReq:(BaseReq *)req{
+    
+}
+
+- (void)onResp:(BaseResp *)resp{
+    if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+        switch ([resp errCode]) {
+            case 0:
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"weixin_share_notification" object:@"success"];
+                break;
+            default:
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"weixin_share_notification" object:@"failed"];
+                break;
+        }
+    }
 }
 
 

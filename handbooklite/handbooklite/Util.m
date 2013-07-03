@@ -157,4 +157,11 @@
     [defaults setObject:currentAppVersion forKey:@"app_version"];
     return [defaults synchronize];
 }
++ (NSString *)subFileName:(NSString *)filePath{
+    NSRange r1 =[filePath rangeOfString:@"/" options:NSBackwardsSearch];
+    filePath =[filePath substringFromIndex:(r1.location+1)];
+    NSRange r2 =[filePath rangeOfString:@"." options:NSBackwardsSearch];
+    filePath =[filePath substringToIndex:r2.location];
+    return filePath;
+}
 @end
