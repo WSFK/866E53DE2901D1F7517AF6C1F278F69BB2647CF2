@@ -84,6 +84,8 @@
   TowCodeAlertView *towCodeAlert;
   
   ShareActionSheet *actionSheet;
+    
+    NSString *currentPageName;
 }
 
 #pragma mark - PROPERTIES

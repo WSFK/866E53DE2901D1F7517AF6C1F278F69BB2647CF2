@@ -1247,6 +1247,7 @@
                                                         stringByAppendingPathComponent:[book dir]]
                                                 target:self
                                                   book:book];
+    [bookViewController setDelegate:self];
     [_myWindow setDisableTap:NO];
     [_myWindow setTarget:[bookViewController scrollView] eventsDelegate:bookViewController];
     

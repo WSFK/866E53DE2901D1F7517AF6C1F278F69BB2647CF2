@@ -12,14 +12,18 @@
 #import <sys/sysctl.h>
 #import <mach/mach.h>
 #import "SinaWeibo.h"
+#import "WXApi.h"
 
 #define kAppKey             @"1655018151"
 #define kAppSecret          @"37f2f7cf376a99489e4158ea805e14ab"
 #define kAppRedirectURI     @"http://www.sina.com"
 
+#define WEI_XIN_APP_ID          @"wx2742a9a5e76088e2"
+#define WEI_XIN_APP_KEY         @"2bd1aaa1672846edeeae34d5473d20b5"
+
 @class BookShelfViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate,iConsoleDelegate>{
+@interface AppDelegate : UIResponder <UIApplicationDelegate,iConsoleDelegate,WXApiDelegate>{
   NSTimer *timer;
 }
 

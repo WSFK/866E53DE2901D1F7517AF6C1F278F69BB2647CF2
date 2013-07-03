@@ -170,6 +170,9 @@ __VA_ARGS__ \
   
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willRotateToInterfaceOrientation:duration:) name:@"willRotate" object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotateFromInterfaceOrientation:) name:@"didRotate" object:nil];
+    
+    //注册微信分享通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(weixinShareNotification:) name:@"weixin_share_notification" object:nil];
   currPage.delegate = self;
 	nextPage.delegate = self;
 	prevPage.delegate = self;
@@ -179,6 +182,17 @@ __VA_ARGS__ \
   [super viewWillDisappear:animated];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:@"willRotate" object:nil];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didRotate" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"weixin_share_notification" object:nil];
+}
+
+//微信分享通知
+- (void)weixinShareNotification:(NSNotification *)notif{
+    NSString *result =[notif object];
+    if([@"success" isEqualToString:result]){
+        [self showMessage:@"分享成功!"];
+    }else{
+        [self showMessage:@"分享失败!"];
+    }
 }
 
 - (void)setupWebView:(UIWebView *)webView {
@@ -967,6 +981,11 @@ __VA_ARGS__ \
   
 	// Sent before a web view begins loading content, useful to trigger actions before the WebView.	
   NSURL *url = [request URL];
+    NSString *str =[url relativePath];
+    if (str) {
+        currentPageName =[Util subFileName:str];
+    }
+    
   if ([webView isEqual:prevPage])
   {
     return YES;
@@ -1574,6 +1593,9 @@ __VA_ARGS__ \
 // ***********************top 操作区
 - (void)didHome:(id)sender{
   
+    if ([delegate respondsToSelector:@selector(didbookViewControllerToHome)]) {
+        [delegate performSelector:@selector(didbookViewControllerToHome)];
+    }
   [self viewDidUnload];
   [self dismissModalViewControllerAnimated:YES];
 }
@@ -1634,6 +1656,14 @@ __VA_ARGS__ \
   towCodeAlert =nil;
 }
 
+//获取index 对应图片的路径
+- (NSString *)shareIndexPicFilePath{
+    if (currentPageName) {
+        return [cachesBookPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_pre.jpg",currentPageName]];
+    }
+    return @"";
+}
+
 //点击分享
 - (void)didShare:(id)sender{
     /**
@@ -1692,11 +1722,19 @@ __VA_ARGS__ \
                         [pdfDownUrl appendString:[json objectForKey:@"pdfUrl"]];
                     }
                 }
+                //获取分享图片
+                NSFileManager *fm =[NSFileManager defaultManager];
+                UIImage *img =nil;
+                if([fm fileExistsAtPath:[self shareIndexPicFilePath]]){
+                    img =[UIImage imageWithContentsOfFile:[self shareIndexPicFilePath]];
+                }
                 actionSheet =[ShareActionSheet actionSheetForTarget:self
                                                           sendImage:[Util getShareTwoCode:currentBook.downnum]
                                                             sendPdf:pdfDownUrl
                                                         sendPdfName:currentBook.name
-                                                       bookShareUrl:[Util getShareTwoCodeUrlString:currentBook.downnum]];
+                                                       bookShareUrl:[Util getShareTwoCodeUrlString:currentBook.downnum]
+                                                           indexPic:img
+                                                           bookName:[currentBook name]];
                 [actionSheet setMailDelegate:self];
                 [actionSheet showInView:self.view];
             });

@@ -51,4 +51,6 @@
 
 + (BOOL)updateAppVersionToSetting:(NSString *)currentAppVersion;
 
++ (NSString *)subFileName:(NSString *)filePath;
+
 @end
