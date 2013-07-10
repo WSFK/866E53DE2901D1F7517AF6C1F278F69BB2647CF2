@@ -8,6 +8,7 @@
 
 #import "WeiXinShare.h"
 #import "WXApi.h"
+#import "iToast.h"
 
 @implementation WeiXinShare
 
@@ -28,6 +29,11 @@
         req.message =mediaMessage;
         //req.scene =WXSceneTimeline; //发送到朋友圈
         [WXApi sendReq:req];
+    }else{
+        iToast *toast =[iToast makeToast:@"安装微信客户端后才可以使用本功能！"];
+        [toast setToastPosition:kToastPositionBottom];
+        [toast setToastDuration:kToastDurationNormal];
+        [toast show];
     }
 }
 
